@@ -31,3 +31,22 @@ dotnet ef database update
 ```
 
 This will create the database if it does not exist and apply the migration to it.
+
+If you want to delete de database you can run this command in the terminal:
+
+```
+dotnet ef database drop
+```
+
+# Running the project
+
+if you use `dotnet watch` to run the project, you can take advantage of hot reload.
+
+1. You run dotnet watch.
+2. The app starts up.
+3. You edit a line of code and press Save.
+4. dotnet watch detects the file change.
+5. It applies the change immediately (or restarts if necessary).
+6. You see the result instantly in the browser.
+
+if you user `dotnet run` to run the project, you will need to stop and restart the application to see any changes you make to the code.

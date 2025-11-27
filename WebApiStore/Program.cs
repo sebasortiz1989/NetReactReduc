@@ -29,5 +29,6 @@ var app = builder.Build();
 // app.UseAuthorization();
 
 app.MapControllers();
+DbInitializer.InitDb(app);
 
 app.Run();

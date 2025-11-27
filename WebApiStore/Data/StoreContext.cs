@@ -5,5 +5,5 @@ namespace WebApiStore.Data;
 
 public class StoreContext(DbContextOptions options) : DbContext(options)
 {
-    public DbSet<Products> Products => Set<Products>();
+    public DbSet<Product> Products => Set<Product>();
 }
