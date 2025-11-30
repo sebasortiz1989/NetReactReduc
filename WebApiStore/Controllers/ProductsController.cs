@@ -5,7 +5,7 @@ using WebApiStore.Entities;
 
 namespace WebApiStore.Controllers;
 
-[Route("api/[controller]")] // https://localhost:5002/api/products
+[Route("api/[controller]")] // https://localhost:5000/api/products
 [ApiController]
 public class ProductsController(StoreContext context) : ControllerBase
 {
@@ -15,7 +15,7 @@ public class ProductsController(StoreContext context) : ControllerBase
         return await context.Products.ToListAsync();
     }
 
-    [HttpGet("{id}")] // https://localhost:5002/api/products/3
+    [HttpGet("{id}")] // https://localhost:5000/api/products/3
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
         var product = await context.Products.FindAsync(id);
