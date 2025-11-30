@@ -3,6 +3,17 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+// Debugging on Android Tablet ----------------------
+if (import.meta.env.DEV) {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost) {
+        import('eruda').then((eruda) => {
+            eruda.default.init();
+        });
+    }
+}
+// -------------------------------------
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
