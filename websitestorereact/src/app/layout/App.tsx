@@ -1,13 +1,11 @@
+import Catalog from "../../features/catalog/Catalog.tsx";
 import {useEffect, useState} from "react";
-import type {Product} from "./Product.ts";
+import type {Product} from "../models/Product.ts";
 
 function App() {
     const [products, setProducts] = useState<Product[]>([]);
 
     const isLocalhost = window.location.hostname === 'localhost';
-
-    // Use 5001 for HTTPS (Localhost)
-    // Use 5005 for HTTP (Network/Phone)
     const protocol = isLocalhost ? 'https' : 'http';
     const port = isLocalhost ? '5005' : '5010';
     const url = `${protocol}://${window.location.hostname}:${port}/api/products`;
@@ -17,10 +15,10 @@ function App() {
             .then(response => response.json())
             .then(data => setProducts(data));
     }, []);
-    
+
     const addProducts = () => {
         setProducts(prevState => [...prevState,
-            { 
+            {
                 id: prevState.length + 1,
                 name: 'product' + (prevState.length + 1),
                 price: (prevState.length * 100) + 100,
@@ -35,14 +33,7 @@ function App() {
     return (
         <div style={{fontSize: '1.2rem'}}>
             <h1 style={{color: 'red'}}>Re-store</h1>
-            <ul>
-                {products.map((product, index) => (
-                    <li key={index}>
-                        {product.name} - ${product.price}
-                    </li>
-                ))}
-            </ul>
-            <button onClick={addProducts}>Add Product</button>
+            <Catalog products={products} addProducts={addProducts}/>
         </div>
     )
 }
