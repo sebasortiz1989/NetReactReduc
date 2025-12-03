@@ -1,6 +1,7 @@
 import Catalog from "../../features/catalog/Catalog.tsx";
 import {useEffect, useState} from "react";
 import type {Product} from "../models/Product.ts";
+import {Box, Button, Container, Typography} from "@mui/material";
 
 function App() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -31,10 +32,14 @@ function App() {
     }
     
     return (
-        <div style={{fontSize: '1.2rem'}}>
-            <h1 style={{color: 'red'}}>Re-store</h1>
+        <Container maxWidth={"xl"}>
+            <Box display="flex" justifyContent={"center"} gap={3} marginY={3}>
+                <Typography variant='h4'>Re-store</Typography>
+                <Button variant='contained' onClick={addProducts}>Add Product</Button>
+            </Box>
+     
             <Catalog products={products} addProducts={addProducts}/>
-        </div>
+        </Container>
     )
 }
 
