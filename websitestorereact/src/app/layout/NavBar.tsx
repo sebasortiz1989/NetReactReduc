@@ -1,25 +1,26 @@
-import {AppBar, Box, Switch, Toolbar, Typography} from "@mui/material";
-import {type Dispatch, type SetStateAction, useState} from "react";
+import { DarkMode, LightMode } from "@mui/icons-material";
+import {AppBar, Box, IconButton, Toolbar, Typography} from "@mui/material";
+import {type Dispatch, type SetStateAction} from "react";
 
 type Props = {
+    darkMode: boolean,
     setDarkMode: Dispatch<SetStateAction<boolean>>
 }
 
-export default function NavBar({setDarkMode}: Props) {
-    const [darkModeText, setDarkModeText] = useState(false);
-
+export default function NavBar({darkMode, setDarkMode}: Props) {
     return (
         <AppBar>
             <Toolbar>
                 <Typography variant='h6'>RE-STORE</Typography>
                 <Box marginLeft='auto' display='flex' alignItems='center'>
-                    <Typography variant='h6'>{darkModeText ? 'Dark Mode' : 'Light Mode'}</Typography>
-                    <Switch
-                        checked={darkModeText}
-                        onChange={(e) => {
-                            setDarkModeText(e.target.checked);
-                            setDarkMode(e.target.checked);
-                        }} />   
+                    <IconButton onClick={()=>setDarkMode(!darkMode)}>
+                        {darkMode ? <DarkMode/> : <LightMode sx={{color: 'yellow'}}/>}
+                    </IconButton>
+                    {/*<Switch*/}
+                    {/*    checked={darkMode}*/}
+                    {/*    onChange={(e) => {*/}
+                    {/*        setDarkMode(e.target.checked);*/}
+                    {/*    }} />*/}
                 </Box>
             </Toolbar>
         </AppBar>

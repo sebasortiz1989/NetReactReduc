@@ -6,6 +6,7 @@ import NavBar from "./NavBar.tsx";
 
 function App() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [darkMode, setDarkMode] = useState(false);
 
     const isLocalhost = window.location.hostname === 'localhost';
     const protocol = isLocalhost ? 'https' : 'http';
@@ -17,12 +18,14 @@ function App() {
             .then(response => response.json())
             .then(data => setProducts(data));
     }, []);
-    
+
+    const darkModeColor = 'radial-gradient(circle, #1e3aBa, #111B27)';
+    const lightModeColor = 'radial-gradient(circle, #baecf9, #f0f9ff)';
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
             background: {
-                default: '#121212'
+                default: darkModeColor
             }
         },
     });
@@ -31,21 +34,20 @@ function App() {
         palette: {
             mode: 'light',
             background: {
-                default: '#eaeaea'
+                default: lightModeColor
             }
         },
     });
 
-    const [darkMode, setDarkMode] = useState(false);
     return (
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
             <CssBaseline />
-            <NavBar setDarkMode = {setDarkMode}/>
+            <NavBar darkMode={darkMode} setDarkMode = {setDarkMode}/>
             <Box sx={{ 
                 minHeight: '100vh',
-                background: darkMode ? '#121212' : '#eaeaea'
-            }}>
-                <Container maxWidth={"xl"} sx={{mt: 12}}>
+                background: darkMode ? darkModeColor : lightModeColor}}
+                py={6}>
+                <Container maxWidth={"xl"} sx={{mt: 8}}>
                     <Catalog products={products}/>
                 </Container>
             </Box>
