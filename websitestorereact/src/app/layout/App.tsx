@@ -1,7 +1,7 @@
 import Catalog from "../../features/catalog/Catalog.tsx";
 import {useEffect, useState} from "react";
 import type {Product} from "../models/Product.ts";
-import {Container} from "@mui/material";
+import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 
 function App() {
@@ -18,14 +18,39 @@ function App() {
             .then(data => setProducts(data));
     }, []);
     
-    return (
-        <>
-            <NavBar/>
-            <Container maxWidth={"xl"} sx={{mt: 12}}>
-                <Catalog products={products}/>
-            </Container>
-        </>
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+            background: {
+                default: '#121212'
+            }
+        },
+    });
 
+    const lightTheme = createTheme({
+        palette: {
+            mode: 'light',
+            background: {
+                default: '#eaeaea'
+            }
+        },
+    });
+
+    const [darkMode, setDarkMode] = useState(false);
+    return (
+        <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+            <CssBaseline />
+            <NavBar setDarkMode = {setDarkMode}/>
+            <Box sx={{ 
+                minHeight: '100vh',
+                background: darkMode ? '#121212' : '#eaeaea'
+            }}>
+                <Container maxWidth={"xl"} sx={{mt: 12}}>
+                    <Catalog products={products}/>
+                </Container>
+            </Box>
+      
+        </ThemeProvider>
     )
 }
 
