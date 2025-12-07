@@ -1,6 +1,6 @@
 import {useParams} from "react-router-dom";
 import type {Product} from "../../app/models/Product.ts";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {Button, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography} from "@mui/material";
 
 export default function ProductDetails() {
