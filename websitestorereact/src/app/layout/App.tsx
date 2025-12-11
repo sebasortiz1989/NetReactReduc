@@ -3,8 +3,13 @@ import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/mate
 import NavBar from "./NavBar.tsx";
 import { Outlet } from "react-router-dom";
 
+const getInitialDarkMode = () => {
+    const storedDarkMode = localStorage.getItem("darkMode");
+    return storedDarkMode ? JSON.parse(storedDarkMode) : true;
+}
+
 function App() {
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(getInitialDarkMode());
     const darkModeColor = 'radial-gradient(circle, #1e3aBa, #111B27)';
     const lightModeColor = 'radial-gradient(circle, #baecf9, #f0f9ff)';
     const darkTheme = createTheme({
@@ -25,10 +30,16 @@ function App() {
         },
     });
 
+    const toggleDarkMode = () => {
+        console.log("Toggling dark mode:", !darkMode);
+        localStorage.setItem("darkMode", JSON.stringify(!darkMode));
+        setDarkMode(!darkMode);
+    }
+    
     return (
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
             <CssBaseline />
-            <NavBar darkMode={darkMode} setDarkMode = {setDarkMode}/>
+            <NavBar toggleDarkMode = {toggleDarkMode} darkMode={darkMode}/>
             <Box sx={{ 
                 minHeight: '100vh',
                 background: darkMode ? darkModeColor : lightModeColor}}
