@@ -1,34 +1,35 @@
-import {useState} from "react";
 import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import { Outlet } from "react-router-dom";
+import {useAppSelector} from "../store/store.ts";
+
+const darkModeColor = 'radial-gradient(circle, #1e3aBa, #111B27)';
+const lightModeColor = 'radial-gradient(circle, #baecf9, #f0f9ff)';
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        background: {
+            default: darkModeColor
+        }
+    },
+});
+
+const lightTheme = createTheme({
+    palette: {
+        mode: 'light',
+        background: {
+            default: lightModeColor
+        }
+    },
+});
 
 function App() {
-    const [darkMode, setDarkMode] = useState(false);
-    const darkModeColor = 'radial-gradient(circle, #1e3aBa, #111B27)';
-    const lightModeColor = 'radial-gradient(circle, #baecf9, #f0f9ff)';
-    const darkTheme = createTheme({
-        palette: {
-            mode: 'dark',
-            background: {
-                default: darkModeColor
-            }
-        },
-    });
-
-    const lightTheme = createTheme({
-        palette: {
-            mode: 'light',
-            background: {
-                default: lightModeColor
-            }
-        },
-    });
-
+    const {darkMode} = useAppSelector(state => state.ui);
+    
     return (
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
             <CssBaseline />
-            <NavBar darkMode={darkMode} setDarkMode = {setDarkMode}/>
+            <NavBar />
             <Box sx={{ 
                 minHeight: '100vh',
                 background: darkMode ? darkModeColor : lightModeColor}}
