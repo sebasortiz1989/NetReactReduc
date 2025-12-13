@@ -27,7 +27,7 @@ public class ExceptionMiddleWare(IHostEnvironment env, ILogger<ExceptionMiddleWa
         {
             Status = context.Response.StatusCode,
             Detail = env.IsDevelopment() ? exception.StackTrace : null,
-            Title = "An error occurred while processing your request.",
+            Title = exception.Message,
         };
 
         var options = new JsonSerializerOptions

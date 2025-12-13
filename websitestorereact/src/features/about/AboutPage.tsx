@@ -1,12 +1,25 @@
-import {Button, ButtonGroup, Container, Typography} from "@mui/material";
+import {Alert, AlertTitle, Button, ButtonGroup, Container, List, ListItem, Typography} from "@mui/material";
 import {useLazyGet400ErrorQuery, useLazyGet401ErrorQuery, useLazyGet404ErrorQuery, useLazyGet500ErrorQuery, useLazyGetValidationErrorQuery} from "./errorApi.ts";
+import {useState} from "react";
 
 export default function AboutPage(){
+    const [validationErrors, setValidationErrors] = useState<string[]>([]);
     const [trigger400Error] = useLazyGet400ErrorQuery();
     const [trigger401Error] = useLazyGet401ErrorQuery();
     const [trigger404Error] = useLazyGet404ErrorQuery();
     const [trigger500Error] = useLazyGet500ErrorQuery();
     const [triggerValidationError] = useLazyGetValidationErrorQuery();
+    
+    const getValidationError = async () => {
+        try {
+            await triggerValidationError().unwrap();
+        } catch (err : unknown) {
+            if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') {
+                const errorArray = err.message.split(", ");
+                setValidationErrors(errorArray);
+            }
+        }
+    }
     
     return (
         <Container maxWidth='lg'>
@@ -16,8 +29,19 @@ export default function AboutPage(){
                 <Button variant='contained' onClick={() => trigger401Error().catch(err => console.log(err)) }>Test 401 Error</Button>
                 <Button variant='contained' onClick={() => trigger404Error().catch(err => console.log(err))}>Test 404 Error</Button>
                 <Button variant='contained' onClick={() => trigger500Error().catch(err => console.log(err))}>Test 500 Error</Button>
-                <Button variant='contained' onClick={() => triggerValidationError().catch(err => console.log(err))}>Test Validation Error</Button>
+                <Button variant='contained' onClick={() => getValidationError()}>Test Validation Error</Button>
             </ButtonGroup>
+
+            {validationErrors.length > 0 && (
+                <Alert severity='error'>
+                    <AlertTitle>Validation errors</AlertTitle>
+                    <List>
+                        {validationErrors.map((error) => (
+                            <ListItem key={error}>{error}</ListItem>
+                        ))}
+                    </List>
+                </Alert>
+            )}
         </Container>
     )
 }
