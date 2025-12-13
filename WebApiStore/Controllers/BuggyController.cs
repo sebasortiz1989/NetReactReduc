@@ -13,7 +13,7 @@ public class BuggyController : BaseApiController
     [HttpGet("bad-request")]
     public IActionResult GetBadRequest()
     {
-        return BadRequest("This is a good request");
+        return BadRequest("This is not a good request");
     }
 
     [HttpGet("unauthorized")]
