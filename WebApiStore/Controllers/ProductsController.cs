@@ -5,9 +5,8 @@ using WebApiStore.Entities;
 
 namespace WebApiStore.Controllers;
 
-[Route("api/[controller]")] // https://localhost:5000/api/products
-[ApiController]
-public class ProductsController(StoreContext context) : ControllerBase
+// https://localhost:5000/api/products
+public class ProductsController(StoreContext context) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<List<Product>>> GetProducts()
