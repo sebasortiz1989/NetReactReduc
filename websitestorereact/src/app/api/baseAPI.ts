@@ -1,6 +1,7 @@
 import {type BaseQueryApi, type FetchArgs, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {startLoading, stopLoading} from "../layout/uiSlice.ts";
 import {toast} from "react-toastify";
+import {router} from "../routes/Routes.tsx";
 
 const isLocalhost = window.location.hostname === 'localhost';
 const protocol = isLocalhost ? 'https' : 'http';
@@ -48,8 +49,8 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
                 }
                 break;
             case 500:
-                if (typeof data === 'object' && 'title' in data) {
-                    toast.error(data.title);
+                if (typeof data === 'object') {
+                    await router.navigate('/server-error', {state: {error: data}});
                 }
                 break;
             default:
