@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
+using WebApiStore.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +11,12 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddCors();
+builder.Services.AddTransient<ExceptionMiddleWare>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleWare>();
 app.UseCors(opt =>
 {
     opt.AllowAnyHeader().AllowAnyMethod().WithOrigins(
