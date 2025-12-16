@@ -1,0 +1,139 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApiStore.Data;
+using WebApiStore.Entities;
+
+namespace WebApiStore.Controllers;
+
+public class BasketController(StoreContext context) : BaseApiController
+{
+    [HttpGet]
+    public async Task<ActionResult<Basket>> GetBasket()
+    {
+        var basketId = Request.Cookies["basketId"];
+        if (string.IsNullOrEmpty(basketId))
+        {
+            return BadRequest("BasketId is required.");
+        }
+
+        var basket = await RetrieveBasket(basketId);
+        
+        if (basket == null)
+        {
+            return NoContent();
+        }
+
+        return Ok(basket);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> AddItemToBasket(int productId, int quantity)
+    {
+        if (quantity <= 0)
+        {
+            return BadRequest("Quantity must be greater than zero.");
+        }
+
+        var basketId = Request.Cookies["basketId"];
+
+        Basket basket;
+        if (basketId == null)
+        {
+            basket = CreateBasket();
+        }
+        else
+        {
+            basket = await RetrieveBasket(basketId) ?? CreateBasket();
+        }
+
+        var product = await context.Products.FindAsync(productId);
+        if (product == null)
+            return BadRequest("Product not found.");
+
+        var item = basket.Items.FirstOrDefault(x => x.ProductId == product.Id);
+        if (item == null)
+        {
+            basket.Items.Add(new BasketItem
+            {
+                Product = product,
+                ProductId = product.Id,
+                Quantity = quantity
+            });
+        }
+        else
+        {
+            item.Quantity += quantity;
+        }
+
+        var result = await context.SaveChangesAsync();
+        return result > 0 ? CreatedAtAction(nameof(GetBasket), basket) : BadRequest("Problem saving item to basket.");
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> RemoveItemFromBasket(int productId, int quantity)
+    {
+        if (quantity <= 0)
+        {
+            return BadRequest("Quantity must be greater than zero.");
+        }
+
+        var basketId = Request.Cookies["basketId"];
+        if (string.IsNullOrEmpty(basketId))
+        {
+            return BadRequest("BasketId is required.");
+        }
+
+        var basket = await RetrieveBasket(basketId);
+        
+        if (basket == null)
+        {
+            return NoContent();
+        }
+
+        // Remove item from basket or just reduce quantity
+        var item = basket.Items.FirstOrDefault(x => x.ProductId == productId);
+        if (item == null)
+        {
+            return NotFound();
+        }
+
+        if (item.Quantity <= quantity)
+        {
+            basket.Items.Remove(item);
+        }
+        else
+        {
+            item.Quantity -= quantity;
+        }
+
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    private async Task<Basket?> RetrieveBasket(string basketId)
+    {
+        return await context.Baskets
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.BasketId == basketId);
+    }
+
+    private Basket CreateBasket()
+    {
+        var basketId = Guid.NewGuid().ToString();
+        var cookieOptions = new CookieOptions
+        {
+            IsEssential = true,
+            Expires = DateTime.UtcNow.AddDays(30),
+        };
+
+        Response.Cookies.Append("basketId", basketId, cookieOptions);
+        var basket = new Basket
+        {
+            BasketId = basketId
+        };
+
+        context.Baskets.Add(basket);
+        return basket;
+    }
+}
