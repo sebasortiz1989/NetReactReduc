@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
+using WebApiStore.DTOs;
 using WebApiStore.Entities;
 
 namespace WebApiStore.Controllers;
@@ -8,7 +9,7 @@ namespace WebApiStore.Controllers;
 public class BasketController(StoreContext context) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<Basket>> GetBasket()
+    public async Task<ActionResult<BasketDto>> GetBasket()
     {
         var basketId = Request.Cookies["basketId"];
         if (string.IsNullOrEmpty(basketId))
@@ -23,7 +24,20 @@ public class BasketController(StoreContext context) : BaseApiController
             return NoContent();
         }
 
-        return Ok(basket);
+        return Ok(new BasketDto
+        {
+            Id = basket.BasketId,
+            Items = basket.Items.Select(item => new BasketItemDto
+            {
+                ProductId = item.ProductId,
+                Name = item.Product.Name,
+                Price = item.Product.Price,
+                Quantity = item.Quantity,
+                PictureUrl = item.Product.PictureUrl,
+                Brand = item.Product.Brand,
+                Type = item.Product.Type
+            }).ToList()
+        });
     }
 
     [HttpPost]
@@ -66,7 +80,20 @@ public class BasketController(StoreContext context) : BaseApiController
         }
 
         var result = await context.SaveChangesAsync();
-        return result > 0 ? CreatedAtAction(nameof(GetBasket), basket) : BadRequest("Problem saving item to basket.");
+        return result > 0 ? CreatedAtAction(nameof(GetBasket), new BasketDto
+        {
+            Id = basket.BasketId,
+            Items = basket.Items.Select(i => new BasketItemDto
+            {
+                ProductId = i.ProductId,
+                Name = i.Product.Name,
+                Price = i.Product.Price,
+                Quantity = i.Quantity,
+                PictureUrl = i.Product.PictureUrl,
+                Brand = i.Product.Brand,
+                Type = i.Product.Type
+            }).ToList()
+        }) : BadRequest("Problem saving item to basket.");
     }
 
     [HttpDelete]
