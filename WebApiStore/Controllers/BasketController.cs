@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
 using WebApiStore.DTOs;
 using WebApiStore.Entities;
+using WebApiStore.Extensions;
 
 namespace WebApiStore.Controllers;
 
@@ -24,20 +25,7 @@ public class BasketController(StoreContext context) : BaseApiController
             return NoContent();
         }
 
-        return Ok(new BasketDto
-        {
-            Id = basket.BasketId,
-            Items = basket.Items.Select(item => new BasketItemDto
-            {
-                ProductId = item.ProductId,
-                Name = item.Product.Name,
-                Price = item.Product.Price,
-                Quantity = item.Quantity,
-                PictureUrl = item.Product.PictureUrl,
-                Brand = item.Product.Brand,
-                Type = item.Product.Type
-            }).ToList()
-        });
+        return Ok(basket.ToDto());
     }
 
     [HttpPost]
@@ -64,36 +52,11 @@ public class BasketController(StoreContext context) : BaseApiController
         if (product == null)
             return BadRequest("Product not found.");
 
-        var item = basket.Items.FirstOrDefault(x => x.ProductId == product.Id);
-        if (item == null)
-        {
-            basket.Items.Add(new BasketItem
-            {
-                Product = product,
-                ProductId = product.Id,
-                Quantity = quantity
-            });
-        }
-        else
-        {
-            item.Quantity += quantity;
-        }
-
+        basket.AddItem(product, quantity);
         var result = await context.SaveChangesAsync();
-        return result > 0 ? CreatedAtAction(nameof(GetBasket), new BasketDto
-        {
-            Id = basket.BasketId,
-            Items = basket.Items.Select(i => new BasketItemDto
-            {
-                ProductId = i.ProductId,
-                Name = i.Product.Name,
-                Price = i.Product.Price,
-                Quantity = i.Quantity,
-                PictureUrl = i.Product.PictureUrl,
-                Brand = i.Product.Brand,
-                Type = i.Product.Type
-            }).ToList()
-        }) : BadRequest("Problem saving item to basket.");
+        return result > 0 ?
+            CreatedAtAction(nameof(GetBasket), basket.ToDto()) :
+            BadRequest("Problem saving item to basket.");
     }
 
     [HttpDelete]
@@ -117,24 +80,11 @@ public class BasketController(StoreContext context) : BaseApiController
             return NoContent();
         }
 
-        // Remove item from basket or just reduce quantity
-        var item = basket.Items.FirstOrDefault(x => x.ProductId == productId);
-        if (item == null)
-        {
-            return NotFound();
-        }
-
-        if (item.Quantity <= quantity)
-        {
-            basket.Items.Remove(item);
-        }
-        else
-        {
-            item.Quantity -= quantity;
-        }
-
-        await context.SaveChangesAsync();
-        return Ok();
+        basket.RemoveItem(productId, quantity);
+        var result = await context.SaveChangesAsync();
+        return result > 0 ?
+            Ok(basket.ToDto()) :
+            BadRequest("Problem removing item from basket.");
     }
 
     private async Task<Basket?> RetrieveBasket(string basketId)

@@ -1,3 +1,5 @@
+using WebApiStore.DTOs;
+
 namespace WebApiStore.Entities;
 
 public class Basket
@@ -28,13 +30,12 @@ public class Basket
         }
     }
 
-    public void RemoveItem(Product product, int quantity)
+    public void RemoveItem(int productId, int quantity)
     {
-        ArgumentNullException.ThrowIfNull(product);
         if (quantity <= 0 )
             throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be greater than zero");
 
-        var existingItem = Items.FirstOrDefault(i => i.ProductId == product.Id);
+        var existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
         if (existingItem == null)
             return;
 
