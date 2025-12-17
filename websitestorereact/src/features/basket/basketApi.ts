@@ -7,7 +7,10 @@ export const basketApi = createApi({
     baseQuery: baseQueryWithErrorHandling,
     endpoints: (builder) => ({
         fetchBasket: builder.query<Basket,  void>({
-            query: () => 'basket',
+            query: () => ({
+                url: 'basket',
+                credentials: 'include'
+            } as never),
         }),
         addItemToBasket: builder.mutation<Basket, {productId: number, quantity?: number}>({
             query: ({productId, quantity}) => ({

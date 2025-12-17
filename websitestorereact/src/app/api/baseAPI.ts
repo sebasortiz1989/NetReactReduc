@@ -10,6 +10,7 @@ const baseUrl = `${protocol}://${window.location.hostname}:${port}/api`;
 
 const customBaseQuery = fetchBaseQuery({
     baseUrl: baseUrl,
+    credentials: 'include',
 });
 
 type ErrorResponse = | string | { title: string; } | {errors: string[]};

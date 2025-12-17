@@ -1,5 +1,5 @@
 export type Basket = {
-    id: string
+    basketId: string
     items: Item[]
 }
 

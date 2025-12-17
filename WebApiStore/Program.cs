@@ -19,10 +19,10 @@ var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleWare>();
 app.UseCors(opt =>
 {
-    opt.AllowAnyHeader().AllowAnyMethod().WithOrigins(
+    opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(
         "https://localhost:3000",
         "http://localhost:3000",
-        "http://192.168.0.108:3000"
+        "http://192.168.0.234:3000"
     );
 });
 
