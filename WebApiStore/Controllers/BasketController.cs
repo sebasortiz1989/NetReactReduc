@@ -83,7 +83,7 @@ public class BasketController(StoreContext context) : BaseApiController
         basket.RemoveItem(productId, quantity);
         var result = await context.SaveChangesAsync();
         return result > 0 ?
-            Ok(basket.ToDto()) :
+            Ok() :
             BadRequest("Problem removing item from basket.");
     }
 

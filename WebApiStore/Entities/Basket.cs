@@ -1,5 +1,3 @@
-using WebApiStore.DTOs;
-
 namespace WebApiStore.Entities;
 
 public class Basket
