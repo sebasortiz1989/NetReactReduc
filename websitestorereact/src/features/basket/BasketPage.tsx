@@ -1,5 +1,6 @@
+import {Grid, Typography} from "@mui/material";
 import {useFetchBasketQuery} from "./basketApi.ts";
-import {Typography} from "@mui/material";
+import BasketItem from "./BasketItem.tsx";
 
 export default function BasketPage() {
     const {data,  isLoading} = useFetchBasketQuery();
@@ -13,6 +14,12 @@ export default function BasketPage() {
     }
 
     return (
-        <div>{data.basketId}</div>
+        <Grid container spacing={2}>
+            <Grid size={8}>
+                {data.items.map((item) => (
+                    <BasketItem item={item} key={item.productId}/>
+                ))}
+            </Grid>
+        </Grid>
     )
 }
