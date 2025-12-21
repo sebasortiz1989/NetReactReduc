@@ -29,7 +29,7 @@ export default function ProductCard({product}: Props) {
             </CardContent>
 
             <CardActions sx={{justifyContent: 'space-between'}}>
-                <Button disabled={isLoading} onClick={() => addBasketItem({productId: product.id, quantity: 1})}>
+                <Button disabled={isLoading} onClick={() => addBasketItem({product, quantity: 1})}>
                     Add to cart
                 </Button>
                 <Button component={Link} to={`/catalog/${product.id}`}>View</Button>

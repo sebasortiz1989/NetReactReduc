@@ -1,6 +1,7 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQueryWithErrorHandling} from "../../app/api/baseAPI.ts";
-import type {Basket} from "../../app/models/Basket.ts";
+import {type Basket, Item} from "../../app/models/Basket.ts";
+import type {Product} from "../../app/models/Product.ts";
 
 type ServerBasket = {
     id: string
@@ -27,19 +28,30 @@ export const basketApi = createApi({
             },
             providesTags: ['Basket'],
         }),
-        addItemToBasket: builder.mutation<Basket, {productId: number, quantity?: number}>({
-            query: ({productId, quantity}) => ({
-                url: `basket?productId=${productId}&quantity=${quantity}`,
+        addItemToBasket: builder.mutation<Basket, {product: Product, quantity?: number}>({
+            query: ({product, quantity}) => ({
+                url: `basket?productId=${product.id}&quantity=${quantity}`,
                 method: 'POST',
             }),
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+            onQueryStarted: async ({product, quantity}, { dispatch, queryFulfilled }) => {
+                const patchResult = dispatch(
+                    basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        const item = draft.items.find(i => i.productId === product.id);
+                        if (item) {
+                            item.quantity += quantity ?? 1;
+                        } else {
+                            draft.items.push(new Item(product, quantity ?? 1));
+                        }
+                    })
+                );
+
                 try {
                     await queryFulfilled;
-                    dispatch(basketApi.util.invalidateTags(['Basket']));
                 } catch {
-                    // do nothing
+                    patchResult.undo();
                 }
-            }}),
+            },
+        }),
         removeItemFromBasket: builder.mutation<void, {productId: number, quantity: number}>({
             query: ({productId, quantity}) => ({
                 url: `basket?productId=${productId}&quantity=${quantity}`,
