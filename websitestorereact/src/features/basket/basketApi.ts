@@ -52,6 +52,28 @@ export const basketApi = createApi({
                 }
             },
         }),
+        addItemToBasketById: builder.mutation<Basket, {productId: number, quantity?: number}>({
+            query: ({productId, quantity}) => ({
+                url: `basket?productId=${productId}&quantity=${quantity}`,
+                method: 'POST',
+            }),
+            onQueryStarted: async ({productId, quantity}, { dispatch, queryFulfilled }) => {
+                const patchResult = dispatch(
+                    basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        const item = draft.items.find(i => i.productId === productId);
+                        if (item) {
+                            item.quantity += quantity ?? 1;
+                        }
+                    })
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            },
+        }),
         removeItemFromBasket: builder.mutation<void, {productId: number, quantity: number}>({
             query: ({productId, quantity}) => ({
                 url: `basket?productId=${productId}&quantity=${quantity}`,
@@ -85,5 +107,6 @@ export const basketApi = createApi({
 export const {
     useFetchBasketQuery,
     useAddItemToBasketMutation,
+    useAddItemToBasketByIdMutation,
     useRemoveItemFromBasketMutation
 } = basketApi;
