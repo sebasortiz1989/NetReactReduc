@@ -1,12 +1,15 @@
 import {Box, Grid, IconButton, Paper, Typography} from "@mui/material";
 import type {Item} from "../../app/models/Basket.ts";
 import {Add, Close, Remove } from "@mui/icons-material";
+import {useRemoveItemFromBasketMutation} from "./basketApi.ts";
 
 type Props = {
     item: Item
 }
 
 export default function BasketItem({ item }: Props) {
+    const [removeBasketItem] = useRemoveItemFromBasketMutation();
+    
     return (
         <Paper sx={{
             height: 140,
@@ -30,7 +33,7 @@ export default function BasketItem({ item }: Props) {
                     </Box>
                     
                     <Grid container spacing={1} alignItems='center'>
-                        <IconButton color='error' size='small' sx={{border: 1, borderRadius: 1, minWidth: 0}}>
+                        <IconButton onClick={() => removeBasketItem({productId: item.productId, quantity: 1})} color='error' size='small' sx={{border: 1, borderRadius: 1, minWidth: 0}}>
                             <Remove/>
                         </IconButton>
                         <Typography variant='h6'>{item.quantity}</Typography>
@@ -41,7 +44,11 @@ export default function BasketItem({ item }: Props) {
                 </Box>
             </Box>
 
-            <IconButton color='error' size='small' sx={{border: 1, borderRadius: 1, minWidth: 0, alignSelf: 'start', margin: 1}}>
+            <IconButton
+                onClick={() => removeBasketItem({productId: item.productId, quantity: item.quantity})}
+                color='error'
+                size='small'
+                sx={{border: 1, borderRadius: 1, minWidth: 0, alignSelf: 'start', margin: 1}}>
                 <Close/>
             </IconButton>
         </Paper>

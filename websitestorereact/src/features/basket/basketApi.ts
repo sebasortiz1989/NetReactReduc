@@ -57,6 +57,27 @@ export const basketApi = createApi({
                 url: `basket?productId=${productId}&quantity=${quantity}`,
                 method: 'DELETE',
             }),
+            onQueryStarted: async ({productId, quantity}, { dispatch, queryFulfilled }) => {
+                const patchResult = dispatch(
+                    basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        const itemIndex = draft.items.findIndex(i => i.productId === productId);
+                        if (itemIndex >= 0) {
+                            const item = draft.items[itemIndex];
+                            item.quantity -= quantity;
+                            if (item.quantity <= 0) {
+                                draft.items.splice(itemIndex, 1);
+                            }
+                        }
+                    })
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch (error) {
+                    console.log(error)
+                    patchResult.undo();
+                }
+            },
         }),
     }),
 });
