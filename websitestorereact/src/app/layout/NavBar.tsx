@@ -32,8 +32,8 @@ export default function NavBar() {
     const { isLoading, darkMode } = useAppSelector(state => state.ui);
     const dispatch = useAppDispatch();
     const {data: basket} = useFetchBasketQuery();
-    const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
-    
+    const itemCount = basket?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
     return (
         <AppBar>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

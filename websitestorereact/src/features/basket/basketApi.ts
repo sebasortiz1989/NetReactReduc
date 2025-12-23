@@ -18,13 +18,14 @@ export const basketApi = createApi({
     baseQuery: baseQueryWithErrorHandling,
     tagTypes : ['Basket'],
     endpoints: (builder) => ({
-        fetchBasket: builder.query<Basket, void>({
+        fetchBasket: builder.query<Basket | null, void>({
             query: () => ({ url: 'basket', method: 'GET' }),
-            transformResponse: (response: ServerBasket): Basket => {
+            transformResponse: (response: ServerBasket | null): Basket | null => {
+                if (!response) return null;
                 return {
                     basketId: response.id,
                     items: response.items,
-                } as Basket
+                } as Basket;
             },
             providesTags: ['Basket'],
         }),
@@ -34,19 +35,34 @@ export const basketApi = createApi({
                 method: 'POST',
             }),
             onQueryStarted: async ({product, quantity}, { dispatch, queryFulfilled }) => {
+                let isNewBasket = false;
                 const patchResult = dispatch(
                     basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        if (!draft) {
+                            isNewBasket = true;
+                            return;
+                        }
                         const item = draft.items.find(i => i.productId === product.id);
-                        if (item) {
-                            item.quantity += quantity ?? 1;
-                        } else {
-                            draft.items.push(new Item(product, quantity ?? 1));
+
+                        if (!draft.basketId)
+                            isNewBasket = true;
+
+                        if (!isNewBasket)
+                        {
+                            if (item) {
+                                item.quantity += quantity ?? 1;
+                            } else {
+                                draft.items.push({...product, productId: product.id, quantity: quantity ?? 1} as Item);
+                            }
                         }
                     })
                 );
 
                 try {
                     await queryFulfilled;
+                    if (isNewBasket)
+                        dispatch(basketApi.util.invalidateTags(['Basket']));
+
                 } catch {
                     patchResult.undo();
                 }
@@ -60,6 +76,7 @@ export const basketApi = createApi({
             onQueryStarted: async ({productId, quantity}, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        if (!draft) return;
                         const item = draft.items.find(i => i.productId === productId);
                         if (item) {
                             item.quantity += quantity ?? 1;
@@ -82,6 +99,7 @@ export const basketApi = createApi({
             onQueryStarted: async ({productId, quantity}, { dispatch, queryFulfilled }) => {
                 const patchResult = dispatch(
                     basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
+                        if (!draft) return;
                         const itemIndex = draft.items.findIndex(i => i.productId === productId);
                         if (itemIndex >= 0) {
                             const item = draft.items[itemIndex];

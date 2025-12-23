@@ -15,7 +15,7 @@ public class BasketController(StoreContext context) : BaseApiController
         var basketId = Request.Cookies["basketId"];
         if (string.IsNullOrEmpty(basketId))
         {
-            return BadRequest("BasketId is required.");
+            return NoContent();
         }
 
         var basket = await RetrieveBasket(basketId);

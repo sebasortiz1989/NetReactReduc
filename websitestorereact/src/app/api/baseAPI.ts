@@ -23,9 +23,22 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
     const result = await customBaseQuery(args, api, extraOptions);
 
     api.dispatch(stopLoading());
+
     if (result.error) {
         const status = result.error.status as number;
         const data = result.error.data as ErrorResponse;
+
+        const isFetchBasketRequest =
+            (typeof args === 'string' && args.replace(/^\//, '') === 'basket') ||
+            (typeof args === 'object' && args.url?.replace(/^\//, '') === 'basket' && (args.method ?? 'GET').toUpperCase() === 'GET');
+
+        const isMissingBasketId = status === 400 && typeof data === 'string' && data.toLowerCase().includes('basketid is required');
+
+        // Treat "no basket yet" as a normal "empty" result; downstream code can handle null.
+        if (isFetchBasketRequest && isMissingBasketId) {
+            return { data: null, meta: result.meta };
+        }
+
         console.error("API Error:", result.error);
         switch (status) {
             case 400:
