@@ -1,10 +1,14 @@
 import {useParams} from "react-router-dom";
 import {Button, Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography} from "@mui/material";
 import {useFetchProductDetailsQuery} from "./catalogApi.ts";
+import {useAddItemToBasketMutation} from "../basket/basketApi.ts";
+import {useState} from "react";
 
 export default function ProductDetails() {
     const { id } = useParams();
     const { data: product } = useFetchProductDetailsQuery(id ? parseInt(id) : 0);
+    const [addBasketItem, { isLoading }] = useAddItemToBasketMutation();
+    const [quantity, setQuantity] = useState<number>(1);
 
     if (!product)
         return <div>Loading...</div>;
@@ -44,12 +48,21 @@ export default function ProductDetails() {
                         <TextField
                             variant="outlined"
                             type="number"
-                            label="Quantity in basket"
+                            label="Quantity"
                             fullWidth
-                            defaultValue={1} />
+                            value={quantity}
+                            onChange={e => setQuantity(Math.max(1, Number(e.currentTarget.value)))}/>
                     </Grid>
                     <Grid size={6}>
-                        <Button color="primary" size="large" variant="contained" fullWidth sx={{height: 55}}>Add to Basket</Button>
+                        <Button
+                            disabled={isLoading}
+                            onClick={() => addBasketItem({product, quantity})}
+                            color="primary"
+                            size="large"
+                            variant="contained"
+                            fullWidth sx={{height: 55}}>
+                            Add to Basket
+                        </Button>
                     </Grid>
                 </Grid>
             </Grid>
