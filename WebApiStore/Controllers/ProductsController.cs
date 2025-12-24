@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
 using WebApiStore.Entities;
 using WebApiStore.Extensions;
+using WebApiStore.RequestHelpers;
 
 namespace WebApiStore.Controllers;
 
@@ -10,11 +11,12 @@ namespace WebApiStore.Controllers;
 public class ProductsController(StoreContext context) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetProducts(string? orderBy, string? searchTerm)
+    public async Task<ActionResult<List<Product>>> GetProducts([FromQuery]ProductParams productParams)
     {
         var query = context.Products
-            .Sort(orderBy)
-            .Search(searchTerm)
+            .Sort(productParams.OrderBy)
+            .Search(productParams.SearchTerm)
+            .Filter(productParams.Brands, productParams.Types)
             .AsQueryable();
         return await query.ToListAsync();
     }

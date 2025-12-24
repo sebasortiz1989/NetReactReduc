@@ -24,4 +24,23 @@ public static class ProductExtensions
         var lowerCaseTerm = searchTerm.Trim().ToLower();
         return query.Where(p => p.Name.ToLower().Contains(lowerCaseTerm));
     }
+
+    public static IQueryable<Product> Filter(this IQueryable<Product> query, string? brands, string? types)
+    {
+        var brandList = new List<string>();
+        var typeList = new List<string>();
+        if (!string.IsNullOrEmpty(brands))
+            brandList.AddRange(brands.ToLower().Split(',').ToList());
+
+        if (!string.IsNullOrEmpty(types))
+            typeList.AddRange(types.ToLower().Split(',').ToList());
+
+        if (brandList.Count > 0)
+            query = query.Where(p => brandList.Contains(p.Brand.ToLower()));
+
+        if (typeList.Count > 0)
+            query = query.Where(p => typeList.Contains(p.Type.ToLower()));
+
+        return query;
+    }
 }
