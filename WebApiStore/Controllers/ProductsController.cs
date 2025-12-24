@@ -18,7 +18,11 @@ public class ProductsController(StoreContext context) : BaseApiController
             .Search(productParams.SearchTerm)
             .Filter(productParams.Brands, productParams.Types)
             .AsQueryable();
-        return await query.ToListAsync();
+        
+        var products = await PagedList<Product>.ToPagedListAsync(query, productParams.PageNumber, productParams.PageSize);
+        
+        Response.AddPaginationHeader(products.Metadata);
+        return products;
     }
 
     [HttpGet("{id}")] // https://localhost:5000/api/products/3
