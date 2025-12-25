@@ -1,16 +1,43 @@
 import ProductList from "./ProductList.tsx";
-import {useFetchProductsQuery} from "./catalogApi.ts";
+import {useFetchFiltersQuery, useFetchProductsQuery} from "./catalogApi.ts";
+import {Grid, Typography} from "@mui/material";
+import Filters from "./Filters.tsx";
+import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
+import {setPageNumber} from "./catalogSlice.ts";
+import AppPagination from "../../app/shared/components/AppPagination.tsx";
 
 export default function Catalog() {
-    const {data, isLoading} = useFetchProductsQuery();
+    const productParams = useAppSelector(state => state.catalogApi);
+    const {data, isLoading} = useFetchProductsQuery(productParams);
+    const {data: filtersData, isLoading: filtersLoading} = useFetchFiltersQuery();
+    const dispatch = useAppDispatch();
     
-    if (isLoading || !data)
+    if (isLoading || !data || !filtersData || filtersLoading)
         return <div>Loading products...</div>;
     
-    
     return (
-        <>
-            <ProductList products={data}/>
-        </>
+        <Grid container spacing={4}>
+            <Grid size={3}>
+                <Filters filtersData={filtersData} />
+            </Grid>
+            <Grid size={9}>
+                {data.items && data.items.length > 0 ? (
+                    <>
+                        <ProductList products={data.items}/>
+                        {data.pagination && (
+                            <AppPagination
+                                metadata={data.pagination}
+                                onPageChange={(page: number) => {
+                                    dispatch(setPageNumber(page));
+                                    window.scrollTo({top: 0, behavior: 'smooth'});
+                                }}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <Typography variant='h5'>There are no results for this filter</Typography>
+                )}
+            </Grid>
+        </Grid>
     )
 }

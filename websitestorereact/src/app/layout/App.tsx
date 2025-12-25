@@ -1,6 +1,6 @@
 import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import NavBar from "./NavBar.tsx";
-import { Outlet } from "react-router-dom";
+import {Outlet, ScrollRestoration} from "react-router-dom";
 import {useAppSelector} from "../store/store.ts";
 
 const darkModeColor = 'radial-gradient(circle, #1e3aBa, #111B27)';
@@ -28,6 +28,7 @@ function App() {
     
     return (
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+            <ScrollRestoration/>
             <CssBaseline />
             <NavBar />
             <Box sx={{ 
