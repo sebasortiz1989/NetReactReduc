@@ -31,4 +31,12 @@ public class ProductsController(StoreContext context) : BaseApiController
         var product = await context.Products.FindAsync(id);
         return product != null ? product : NotFound();
     }
+
+    [HttpGet("filters")]
+    public async Task<IActionResult> GetFilters()
+    {
+        var brands = await context.Products.Select(p => p.Brand).Distinct().ToListAsync();
+        var types = await context.Products.Select(p => p.Type).Distinct().ToListAsync();
+        return Ok(new { brands, types });
+    }
 }

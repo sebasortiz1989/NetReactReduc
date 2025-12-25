@@ -1,5 +1,7 @@
 import ProductList from "./ProductList.tsx";
 import {useFetchProductsQuery} from "./catalogApi.ts";
+import {Grid} from "@mui/material";
+import Filters from "./Filters.tsx";
 
 export default function Catalog() {
     const {data, isLoading} = useFetchProductsQuery();
@@ -9,8 +11,13 @@ export default function Catalog() {
     
     
     return (
-        <>
-            <ProductList products={data}/>
-        </>
+        <Grid container spacing={4}>
+            <Grid size={3}>
+                <Filters />
+            </Grid>
+            <Grid size={9}>
+                <ProductList products={data}/>
+            </Grid>
+        </Grid>
     )
 }
