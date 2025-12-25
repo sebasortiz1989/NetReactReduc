@@ -5,10 +5,13 @@ export function currencyFormat(amount: number, currency = 'USD', locale = 'en-US
     }).format(amount / 100);
 }
 
-export function filterEmptyValues(values: object) {
+export function filterEmptyValues(values: Record<string, unknown>) {
     return Object.fromEntries(
-        Object.entries(values).filter(([, value]) =>
-            (value as string[]).length > 0 && value !== undefined && value !== null && value !== ''
-        )
+        Object.entries(values).filter(([, value]) => {
+            if (value === undefined || value === null) return false;
+            if (typeof value === 'string') return value.trim() !== '';
+            if (Array.isArray(value)) return value.length > 0;
+            return true; // keep numbers/booleans/objects
+        })
     );
 }
