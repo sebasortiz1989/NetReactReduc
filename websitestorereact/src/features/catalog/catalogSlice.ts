@@ -36,8 +36,8 @@ export const catalogSlice = createSlice({
             state.searchTerm = action.payload;
             state.pageNumber = 1;
         },
-        resetProductParams: () => initialState
+        resetParams: () => initialState
     }
 });
 
-export const {setPageNumber, setPageSize, setOrderBy, setTypes, setBrands, setSearchTerm, resetProductParams} = catalogSlice.actions;
+export const {setPageNumber, setPageSize, setOrderBy, setTypes, setBrands, setSearchTerm, resetParams} = catalogSlice.actions;

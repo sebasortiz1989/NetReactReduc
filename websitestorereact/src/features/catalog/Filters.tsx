@@ -1,9 +1,8 @@
-import {useFetchFiltersQuery} from "./catalogApi.ts";
-import {Box, Paper, Typography} from "@mui/material";
+import {Box, Button, Paper} from "@mui/material";
 import Search from "./Search.tsx";
 import RadioButtonGroup from "../../app/shared/components/RadioButtonGroup.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
-import {setBrands, setTypes, setOrderBy} from "./catalogSlice.ts";
+import {setBrands, setTypes, setOrderBy, resetParams} from "./catalogSlice.ts";
 import CheckboxButtons from "../../app/shared/components/CheckboxButtons.tsx";
 
 const sortOptions = [
@@ -12,13 +11,16 @@ const sortOptions = [
     {value: 'price', label: 'Price: Low to High'},
 ]
 
-export default function Filters() {
-    const {data} = useFetchFiltersQuery();
+type Props = {
+    filtersData: {
+        brands: string[];
+        types: string[];
+    };
+}
+
+export default function Filters({filtersData: data}: Props) {
     const {orderBy, types, brands} = useAppSelector(state => state.catalogApi);
     const dispatch = useAppDispatch();
-    
-    if (!data?.brands || !data?.types)
-        return <Typography>Loading....</Typography>;
     
     return (
         <Box display='flex' flexDirection='column' gap={3}>
@@ -43,6 +45,12 @@ export default function Filters() {
                     checked={types}
                     onChange={(items: string[]) => dispatch(setTypes(items))}/>
             </Paper>
+            <Button onClick={() => {
+                dispatch(resetParams());
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }}>
+                Reset Filters
+            </Button>
         </Box>
     )
 }

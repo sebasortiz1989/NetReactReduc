@@ -1,5 +1,5 @@
 import ProductList from "./ProductList.tsx";
-import {useFetchProductsQuery} from "./catalogApi.ts";
+import {useFetchFiltersQuery, useFetchProductsQuery} from "./catalogApi.ts";
 import {Grid, Typography} from "@mui/material";
 import Filters from "./Filters.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
@@ -9,15 +9,16 @@ import AppPagination from "../../app/shared/components/AppPagination.tsx";
 export default function Catalog() {
     const productParams = useAppSelector(state => state.catalogApi);
     const {data, isLoading} = useFetchProductsQuery(productParams);
+    const {data: filtersData, isLoading: filtersLoading} = useFetchFiltersQuery();
     const dispatch = useAppDispatch();
     
-    if (isLoading || !data)
+    if (isLoading || !data || !filtersData || filtersLoading)
         return <div>Loading products...</div>;
     
     return (
         <Grid container spacing={4}>
             <Grid size={3}>
-                <Filters />
+                <Filters filtersData={filtersData} />
             </Grid>
             <Grid size={9}>
                 {data.items && data.items.length > 0 ? (
@@ -26,7 +27,10 @@ export default function Catalog() {
                         {data.pagination && (
                             <AppPagination
                                 metadata={data.pagination}
-                                onPageChange={(page: number) => dispatch(setPageNumber(page))}
+                                onPageChange={(page: number) => {
+                                    dispatch(setPageNumber(page));
+                                    window.scrollTo({top: 0, behavior: 'smooth'});
+                                }}
                             />
                         )}
                     </>
