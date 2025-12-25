@@ -24,7 +24,7 @@ export const catalogSlice = createSlice({
             state.orderBy = action.payload;
             state.pageNumber = 1;
         },
-        serTypes(state, action) {
+        setTypes(state, action) {
             state.types = action.payload;
             state.pageNumber = 1;
         },
@@ -40,4 +40,4 @@ export const catalogSlice = createSlice({
     }
 });
 
-export const {setPageNumber, setPageSize, setOrderBy, serTypes, setBrands, setSearchTerm, resetProductParams} = catalogSlice.actions;
+export const {setPageNumber, setPageSize, setOrderBy, setTypes, setBrands, setSearchTerm, resetProductParams} = catalogSlice.actions;
