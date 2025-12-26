@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
+using WebApiStore.Entities;
 using WebApiStore.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,14 @@ builder.Services.AddDbContext<StoreContext>(options =>
 });
 builder.Services.AddCors();
 builder.Services.AddTransient<ExceptionMiddleWare>();
+builder.Services.AddIdentityApiEndpoints<User>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = true;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
 
@@ -27,7 +37,12 @@ app.UseCors(opt =>
     );
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>(); // With this I add endpoints. api/login
+
 
 DbInitializer.InitDb(app);
 
