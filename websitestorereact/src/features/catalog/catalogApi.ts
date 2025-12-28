@@ -20,7 +20,7 @@ export const catalogApi = createApi({
                 const paginationHeader = meta?.response?.headers.get('Pagination');
                 const pagination = paginationHeader ? (JSON.parse(paginationHeader) as Pagination) : null;
                 return {items, pagination};
-            }
+            },
         }),
         fetchProductDetails: builder.query<Product, number>({
             query: (id: number) => ({url: `products/${id}`})

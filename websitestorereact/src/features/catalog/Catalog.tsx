@@ -8,13 +8,13 @@ import AppPagination from "../../app/shared/components/AppPagination.tsx";
 
 export default function Catalog() {
     const productParams = useAppSelector(state => state.catalogApi);
-    const {data, isLoading} = useFetchProductsQuery(productParams);
+    const {data, isLoading} = useFetchProductsQuery(productParams, { refetchOnMountOrArgChange: true });
     const {data: filtersData, isLoading: filtersLoading} = useFetchFiltersQuery();
     const dispatch = useAppDispatch();
-    
+
     if (isLoading || !data || !filtersData || filtersLoading)
         return <div>Loading products...</div>;
-    
+
     return (
         <Grid container spacing={4}>
             <Grid size={3}>
