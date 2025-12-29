@@ -1,15 +1,16 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQueryWithErrorHandling} from "../../app/api/baseAPI.ts";
 import type {User} from "../../app/models/User.ts";
+import type {LoginSchema} from "../../lib/schemas/loginSchema.ts";
 
 export const accountApi = createApi({
     reducerPath: 'accountApi',
     baseQuery: baseQueryWithErrorHandling,
     endpoints: (builder) => ({
-        login: builder.mutation<void, object>({
+        login: builder.mutation<void, LoginSchema>({
             query: (credentials) => {
                 return {
-                    url: 'account/login',
+                    url: 'login?useCookies=true',
                     method: 'POST',
                     body: credentials
                 }
@@ -18,18 +19,18 @@ export const accountApi = createApi({
         register: builder.mutation<void, object>({
             query: (registrationData) => {
                 return {
-                    url: 'account/register',
+                    url: 'register',
                     method: 'POST',
                     body: registrationData
                 }
             }
         }),
         userInfo: builder.query<User, void>({
-            query: () => 'account/user-info'
+            query: () => 'user-info'
         }),
         logout: builder.mutation({
             query: () => ({
-                url: 'account/logout',
+                url: 'logout',
                 method: 'POST'
             })
         })
