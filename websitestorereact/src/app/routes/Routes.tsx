@@ -11,19 +11,22 @@ import BasketPage from "../../features/basket/BasketPage.tsx";
 import CheckoutPage from "../../features/checkout/CheckoutPage.tsx";
 import LoginForm from "../../features/account/LoginForm.tsx";
 import RegisterForm from "../../features/account/RegisterForm.tsx";
+import RequireAuth from "./RequireAuth.tsx";
 
 export const router = createBrowserRouter([
     {
         path: "/",
         element: <App/>,
         children: [
+            {element: <RequireAuth/>, children: [
+                    {path: '/checkout', element: <CheckoutPage/>}, 
+                ]},
             {path: "", element: <HomePage/>},
             {path: 'catalog', element: <Catalog/>},
             {path: 'catalog/:id', element: <ProductDetails />},
             {path: '/about', element: <AboutPage/>},
             {path: '/contact', element: <ContactPage/>},
             {path: '/basket', element: <BasketPage/>},
-            {path: '/checkout', element: <CheckoutPage/>},
             {path: '/server-error', element: <ServerError/>},
             {path: '/register', element: <RegisterForm/>},
             {path: '/login', element: <LoginForm/>},
