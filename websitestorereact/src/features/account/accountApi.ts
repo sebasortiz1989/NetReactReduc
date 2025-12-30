@@ -42,6 +42,7 @@ export const accountApi = createApi({
                     await router.navigate('/login');
                 } catch(error) {
                     console.log(error)
+                    throw error;
                 }
             }
         }),
