@@ -3,6 +3,7 @@ import {baseQueryWithErrorHandling} from "../../app/api/baseAPI.ts";
 import type {User} from "../../app/models/User.ts";
 import type {LoginSchema} from "../../lib/schemas/loginSchema.ts";
 import {router} from "../../app/routes/Routes.tsx";
+import {toast} from "react-toastify";
 
 export const accountApi = createApi({
     reducerPath: 'accountApi',
@@ -32,6 +33,15 @@ export const accountApi = createApi({
                     url: 'account/register',
                     method: 'POST',
                     body: registrationData
+                }
+            },
+            async onQueryStarted(_, {queryFulfilled}) {
+                try {
+                    await queryFulfilled;
+                    toast.success('Registration successful - you can now login');
+                    await router.navigate('/login');
+                } catch(error) {
+                    console.log(error)
                 }
             }
         }),
