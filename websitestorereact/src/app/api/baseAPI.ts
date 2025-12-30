@@ -13,7 +13,32 @@ const customBaseQuery = fetchBaseQuery({
     credentials: 'include',
 });
 
-type ErrorResponse = | string | { title: string; } | {errors: string[]};
+type ErrorResponse = unknown;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null;
+
+const getTitle = (data: unknown): string | undefined => {
+    if (!isRecord(data)) return undefined;
+    const title = data['title'];
+    return typeof title === 'string' ? title : undefined;
+};
+
+const getErrors = (data: unknown): string[] | undefined => {
+    if (!isRecord(data)) return undefined;
+    const errors = data['errors'];
+
+    // supports either { errors: string[] } or { errors: { field: string[] } }
+    if (Array.isArray(errors) && errors.every(e => typeof e === 'string')) return errors;
+
+    if (isRecord(errors)) {
+        return Object.values(errors)
+            .flatMap(v => Array.isArray(v) ? v : [v])
+            .filter((v): v is string => typeof v === 'string');
+    }
+
+    return undefined;
+};
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -40,36 +65,38 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
         }
 
         console.error("API Error:", result.error);
+
         switch (status) {
-            case 400:
+            case 400: {
                 if (typeof data === 'string') {
                     toast.error(data);
+                    break;
                 }
-                else if ('errors' in data) {
-                    throw Object.values(data.errors).flat().join(', ');
+
+                const errors = getErrors(data);
+                if (errors && errors.length > 0) {
+                    throw errors.join(', ');
                 }
-                else{
-                    toast.error(data.title);
-                }
+
+                const title = getTitle(data);
+                toast.error(title ?? 'Bad request');
                 break;
-            case 401:
-                if (typeof data === 'object' && 'title' in data) {
-                    toast.error(data.title);
-                }
+            }
+            case 401: {
+                const title = getTitle(data);
+                toast.error(title ?? 'Unauthorized');
                 break;
+            }
             case 404:
-                if (typeof data === 'object' && 'title' in data) {
-                    await router.navigate('/not-found');
-                }
+                await router.navigate('/not-found');
                 break;
             case 500:
-                if (typeof data === 'object') {
-                    await router.navigate('/server-error', {state: {error: data}});
-                }
+                await router.navigate('/server-error', {state: {error: isRecord(data) ? data : null}});
                 break;
-            default:
-                toast.error(data as string);
+            default: {
+                toast.error(typeof data === 'string' ? data : 'Unexpected error');
                 break;
+            }
         }
     }
 
