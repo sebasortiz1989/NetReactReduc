@@ -6,6 +6,10 @@ public class Basket
     public required string BasketId { get; set; } = string.Empty;
     public List<BasketItem> Items { get; set; } = [];
 
+    public string? ClientSecret { get; set; }
+
+    public string? PaymentIntentId { get; set; }
+
     public void AddItem(Product product, int quantity)
     {
         ArgumentNullException.ThrowIfNull(product);

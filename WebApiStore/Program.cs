@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
 using WebApiStore.Entities;
 using WebApiStore.Middleware;
+using WebApiStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<StoreContext>(options =>
 });
 builder.Services.AddCors();
 builder.Services.AddTransient<ExceptionMiddleWare>();
+builder.Services.AddScoped<PaymentsService>();
 builder.Services.AddIdentityApiEndpoints<User>(options =>
 {
     options.User.RequireUniqueEmail = true;
