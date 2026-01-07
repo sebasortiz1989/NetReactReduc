@@ -31,15 +31,16 @@ public class PaymentsController(PaymentsService paymentsService, StoreContext co
             return BadRequest("Problem with the payment intent");
         }
 
-        if (basket is { PaymentIntentId: not null, ClientSecret: not null })
-            return basket.ToDto();
-
         basket.PaymentIntentId ??= intent.Id;
         basket.ClientSecret ??= intent.ClientSecret;
-        var result = await context.SaveChangesAsync() > 0;
-        if (!result)
+
+        if (context.ChangeTracker.HasChanges())
         {
-            return BadRequest("Problem updating basket with intent");
+            var result = await context.SaveChangesAsync() > 0;
+            if (!result)
+            {
+                return BadRequest("Problem updating basket with intent");
+            }
         }
 
         return basket.ToDto();
