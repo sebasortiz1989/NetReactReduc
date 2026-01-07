@@ -5,7 +5,7 @@ namespace WebApiStore.Services;
 
 public class PaymentsService(IConfiguration config)
 {
-    public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket)
+    public async Task<PaymentIntent?> CreateOrUpdatePaymentIntent(Basket basket)
     {
         StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
         var service = new PaymentIntentService();
@@ -19,7 +19,7 @@ public class PaymentsService(IConfiguration config)
             {
                 Amount = subTotal + deliveryFee,
                 Currency = "brl",
-                PaymentMethodTypes = ["card", "pix"],
+                PaymentMethodTypes = ["card"],
             };
 
             intent = await service.CreateAsync(options);
@@ -31,7 +31,7 @@ public class PaymentsService(IConfiguration config)
                 Amount = subTotal + deliveryFee,
             };
 
-            await service.UpdateAsync(basket.PaymentIntentId, options);
+            intent = await service.UpdateAsync(basket.PaymentIntentId, options);
         }
 
         return intent;

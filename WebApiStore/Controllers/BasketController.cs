@@ -18,7 +18,7 @@ public class BasketController(StoreContext context) : BaseApiController
             return NoContent();
         }
 
-        var basket = await RetrieveBasket(basketId);
+        var basket = await context.Baskets.GetBasketWithItems(basketId);
         
         if (basket == null)
         {
@@ -45,7 +45,7 @@ public class BasketController(StoreContext context) : BaseApiController
         }
         else
         {
-            basket = await RetrieveBasket(basketId) ?? CreateBasket();
+            basket = await context.Baskets.GetBasketWithItems(basketId) ?? CreateBasket();
         }
 
         var product = await context.Products.FindAsync(productId);
@@ -73,7 +73,7 @@ public class BasketController(StoreContext context) : BaseApiController
             return BadRequest("BasketId is required.");
         }
 
-        var basket = await RetrieveBasket(basketId);
+        var basket = await context.Baskets.GetBasketWithItems(basketId);
         
         if (basket == null)
         {
@@ -85,14 +85,6 @@ public class BasketController(StoreContext context) : BaseApiController
         return result > 0 ?
             Ok() :
             BadRequest("Problem removing item from basket.");
-    }
-
-    private async Task<Basket?> RetrieveBasket(string basketId)
-    {
-        return await context.Baskets
-            .Include(x => x.Items)
-            .ThenInclude(x => x.Product)
-            .FirstOrDefaultAsync(x => x.BasketId == basketId);
     }
 
     private Basket CreateBasket()
