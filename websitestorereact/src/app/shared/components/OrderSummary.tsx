@@ -1,9 +1,10 @@
 import { Box, Typography, Divider, Button, TextField, Paper } from "@mui/material";
 import { currencyFormat } from "../../../lib/util";
 import {useFetchBasketQuery} from "../../../features/basket/basketApi.ts";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 export default function OrderSummary() {
+    const location = useLocation();
     const {data: basket} = useFetchBasketQuery();
 
     if (!basket || basket.items.length === 0) return null;
@@ -51,6 +52,7 @@ export default function OrderSummary() {
                 </Box>
 
                 <Box mt={2}>
+                    {!location.pathname.includes('checkout') && (
                     <Button
                         component={Link} to='/checkout'
                         variant="contained"
@@ -60,6 +62,7 @@ export default function OrderSummary() {
                     >
                         Checkout
                     </Button>
+                    )}
                     <Button
                         component={Link} to='/catalog'
                         fullWidth
