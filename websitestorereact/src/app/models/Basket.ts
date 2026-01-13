@@ -3,6 +3,8 @@ import type {Product} from "./Product.ts";
 export type Basket = {
     basketId: string
     items: Item[]
+    clientSecret?: string
+    paymentIntentId?: string
 }
 
 export class Item
