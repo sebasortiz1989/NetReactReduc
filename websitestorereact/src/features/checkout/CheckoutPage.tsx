@@ -4,12 +4,23 @@ import CheckoutStepper from "./CheckoutStepper.tsx";
 import {loadStripe, type StripeElementsOptions} from "@stripe/stripe-js";
 import {Elements} from "@stripe/react-stripe-js";
 import {useFetchBasketQuery} from "../basket/basketApi.ts";
-import {useMemo} from "react";
+import {useEffect, useMemo, useRef} from "react";
+import {useCreatePaymentIntentMutation} from "./checkoutApi.ts";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
 export default function CheckoutPage() {
     const {data: basket} = useFetchBasketQuery();
+    const [createPaymentIntent, {isLoading}] = useCreatePaymentIntentMutation();
+    const created = useRef(false);
+
+    useEffect(() => {
+        if (created.current) return;
+        createPaymentIntent();
+        created.current = true;
+    },
+        [createPaymentIntent]);
+    
     const clientSecret = basket?.clientSecret;
     const options = useMemo<StripeElementsOptions | undefined>(() => {
         if (!clientSecret) return undefined;
@@ -22,7 +33,7 @@ export default function CheckoutPage() {
     return (
         <Grid container spacing={2}>
             <Grid size={8}>
-                {!stripePromise || !options ? (
+                {!stripePromise || !options || isLoading ? (
                     <Typography variant="h6">Loading Checkout...</Typography>
                 ) : (
                     <Elements stripe={stripePromise} options={options}>
