@@ -9,10 +9,10 @@ public class PaymentsService(IConfiguration config)
     {
         StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
         var service = new PaymentIntentService();
-        var intent = new PaymentIntent();
         var subTotal = basket.Items.Sum(item => item.Product.Price * item.Quantity);
         var deliveryFee = subTotal >= 10000 ? 0 : 500;
 
+        PaymentIntent intent;
         if (string.IsNullOrEmpty(basket.PaymentIntentId))
         {
             var options = new PaymentIntentCreateOptions

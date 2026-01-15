@@ -1,5 +1,7 @@
 import {useState} from "react";
-import {Box, Button, Paper, Step, StepLabel, Stepper} from "@mui/material";
+import {Box, Button, FormControlLabel, Paper, Step, StepLabel, Stepper} from "@mui/material";
+import {AddressElement} from "@stripe/react-stripe-js";
+import { CheckBox } from "@mui/icons-material";
 
 const steps = ['Address', 'Payment', 'Review'];
 
@@ -29,7 +31,16 @@ export default function CheckoutStepper() {
             
             <Box sx={{mt: 2}}>
                 <Box sx={{display: activeStep === 0 ? 'block' : 'none'}}>
-                    Address Form Goes Here
+                    <AddressElement
+                        options={{
+                            mode: 'shipping'
+                        }}
+                    />
+                    <FormControlLabel
+                        sx={{display: 'flex', justifyContent: 'end'}}
+                        control={<CheckBox />}
+                        label="Save as default address"
+                    />
                 </Box>
                 <Box sx={{display: activeStep === 1 ? 'block' : 'none'}}>
                     Payment Form Goes Here
