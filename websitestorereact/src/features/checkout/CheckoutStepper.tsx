@@ -1,7 +1,8 @@
 import {useState} from "react";
 import {Box, Button, FormControlLabel, Paper, Step, StepLabel, Stepper} from "@mui/material";
-import {AddressElement} from "@stripe/react-stripe-js";
+import {AddressElement, PaymentElement} from "@stripe/react-stripe-js";
 import { CheckBox } from "@mui/icons-material";
+import Review from "./Review.tsx";
 
 const steps = ['Address', 'Payment', 'Review'];
 
@@ -43,10 +44,10 @@ export default function CheckoutStepper() {
                     />
                 </Box>
                 <Box sx={{display: activeStep === 1 ? 'block' : 'none'}}>
-                    Payment Form Goes Here
+                    <PaymentElement/>
                 </Box>
                 <Box sx={{display: activeStep === 2 ? 'block' : 'none'}}>
-                    Review Order Goes Here
+                    <Review/>
                 </Box>
             </Box>
             
