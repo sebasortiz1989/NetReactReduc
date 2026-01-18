@@ -1,4 +1,3 @@
-import {useFetchBasketQuery} from "../basket/basketApi.ts";
 import {Box, Divider, Table, TableBody, TableCell, TableRow, Typography} from "@mui/material";
 import {currencyFormat} from "../../lib/util.ts";
 import type {ConfirmationToken} from "@stripe/stripe-js";

@@ -20,6 +20,8 @@
     "@reduxjs/toolkit": "^2.11.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.1",
+    "@types/js-cookie": "^3.0.6",
+    "js-cookie": "^3.0.5",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.69.0",
