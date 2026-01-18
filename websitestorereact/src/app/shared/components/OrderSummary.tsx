@@ -1,15 +1,11 @@
 import { Box, Typography, Divider, Button, TextField, Paper } from "@mui/material";
 import { currencyFormat } from "../../../lib/util";
-import {useFetchBasketQuery} from "../../../features/basket/basketApi.ts";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
+import {useBasket} from "../../../lib/hooks/useBasket.ts";
 
 export default function OrderSummary() {
-    const {data: basket} = useFetchBasketQuery();
-
-    if (!basket || basket.items.length === 0) return null;
-
-    const subtotal = basket.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = subtotal > 100 * 100 ? 0 : 5.99 * 100;
+    const {subtotal, deliveryFee} = useBasket();
+    const location = useLocation();
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" maxWidth="lg" mx="auto">
@@ -51,6 +47,7 @@ export default function OrderSummary() {
                 </Box>
 
                 <Box mt={2}>
+                    {!location.pathname.includes('checkout') && (
                     <Button
                         component={Link} to='/checkout'
                         variant="contained"
@@ -60,6 +57,7 @@ export default function OrderSummary() {
                     >
                         Checkout
                     </Button>
+                    )}
                     <Button
                         component={Link} to='/catalog'
                         fullWidth

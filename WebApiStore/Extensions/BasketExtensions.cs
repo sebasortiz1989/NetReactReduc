@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebApiStore.DTOs;
 using WebApiStore.Entities;
 
@@ -10,6 +11,8 @@ public static class BasketExtensions
         return new BasketDto
         {
             Id = basket.BasketId,
+            ClientSecret = basket.ClientSecret,
+            PaymentIntentId = basket.PaymentIntentId,
             Items = basket.Items.Select(item => new BasketItemDto
             {
                 ProductId = item.ProductId,
@@ -21,5 +24,14 @@ public static class BasketExtensions
                 Quantity = item.Quantity
             }).ToList()
         };
+    }
+
+    public static async Task<Basket?> GetBasketWithItems(this IQueryable<Basket> query, string? basketId)
+    {
+        return await query
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.BasketId == basketId)
+               ?? throw new Exception("Basket not found");
     }
 }
