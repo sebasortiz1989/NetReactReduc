@@ -1,9 +1,27 @@
 import {useFetchBasketQuery} from "../basket/basketApi.ts";
 import {Box, Divider, Table, TableBody, TableCell, TableRow, Typography} from "@mui/material";
 import {currencyFormat} from "../../lib/util.ts";
+import type {ConfirmationToken} from "@stripe/stripe-js";
+import {useBasket} from "../../lib/hooks/useBasket.ts";
 
-export default function Review() {
-    const {data: basket} = useFetchBasketQuery();
+type Props = {
+    confirmationToken: ConfirmationToken | null;
+}
+
+export default function Review({confirmationToken} : Props) {
+    const {basket} = useBasket();
+    const addressString = () => {
+        if (!confirmationToken?.shipping) return '';
+        const {name, address} = confirmationToken.shipping;
+        return `${name}, ${address?.line1}, ${address?.line2 ? address.line2 + ', ' : ''}${address?.city}, ${address?.state ? address.state + ', ' : ''}${address?.postal_code}, ${address?.country}`;
+    }
+    
+    const paymentString = () => {
+        if (!confirmationToken?.payment_method_preview.card) return '';
+        const {card} = confirmationToken.payment_method_preview;
+        if (!card) return '';
+        return `${card.brand.toLocaleUpperCase()}, **** **** **** ${card.last4}, exp: ${card.exp_month}/${card.exp_year}`;
+    }
     
     return (
         <div>
@@ -16,14 +34,14 @@ export default function Review() {
                         Shipping Address
                     </Typography>
                     <Typography component='dd' mt={1} color='textSecondary'>
-                        Address goes here
+                        {addressString()}
                     </Typography>
 
                     <Typography component='dt' fontWeight='medium'>
                         Payment Details
                     </Typography>
                     <Typography component='dd' mt={1} color='textSecondary'>
-                        Payment Details go here
+                        {paymentString()}
                     </Typography>
                 </dl>
             </Box>
