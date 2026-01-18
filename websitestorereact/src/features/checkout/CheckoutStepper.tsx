@@ -54,7 +54,8 @@ export default function CheckoutStepper() {
             return;
         }
 
-        setActiveStep(activeStep + 1);
+        if (activeStep < 2)
+            setActiveStep(activeStep + 1);
     };
 
     const confirmPayment = async () => {
@@ -162,6 +163,9 @@ export default function CheckoutStepper() {
                 <Box sx={{display: activeStep === 1 ? 'block' : 'none'}}>
                     <PaymentElement
                         onChange={handlePaymentChange}
+                        options={{
+                            wallets: {applePay: 'never', googlePay: 'never'}
+                        }}
                     />
                 </Box>
                 <Box sx={{display: activeStep === 2 ? 'block' : 'none'}}>
