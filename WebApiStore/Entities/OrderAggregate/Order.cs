@@ -10,7 +10,8 @@ public class Order
     public long Subtotal { get; set; }
     public long DeliveryFee { get; set; }
     public long Discount { get; set; }
-    public string? PaymentIntentId { get; set; }
+    public string PaymentIntentId { get; set; }
+
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public required PaymentSummary PaymentSummary { get; set; }
 

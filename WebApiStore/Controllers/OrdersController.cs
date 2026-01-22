@@ -39,7 +39,7 @@ public class OrdersController(StoreContext context) : BaseApiController
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto orderDto)
     {
         var basket = await context.Baskets.GetBasketWithItems(Request.Cookies["basketId"]);
-        if (basket == null || basket.Items.Count == 0)
+        if (basket == null || basket.Items.Count == 0 || string.IsNullOrEmpty(basket.PaymentIntentId))
         {
             return BadRequest(new ProblemDetails { Title = "Basket is empty" });
         }
