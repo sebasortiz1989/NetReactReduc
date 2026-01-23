@@ -13,30 +13,31 @@ namespace WebApiStore.Controllers;
 public class OrdersController(StoreContext context) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<Order>>> GetOrders()
+    public async Task<ActionResult<List<OrderDto>>> GetOrders()
     {
         var orders = await context.Orders
-            .Include(x => x.OrderItems)
+            .ProjectToOrderDto()
             .Where(y => y.BuyerEmail == User.GetUserName())
             .ToListAsync();
 
-        return Ok(orders);
+        return orders;
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Order>> GetOrderDetails(int id)
+    public async Task<ActionResult<OrderDto>> GetOrderDetails(int id)
     {
         var order = await context.Orders
+            .ProjectToOrderDto()
             .Where(x => x.BuyerEmail == User.GetUserName() && x.Id == id)
             .FirstOrDefaultAsync();
 
         if (order == null) return NotFound();
 
-        return Ok(order);
+        return order;
     }
 
     [HttpPost]
-    public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto orderDto)
+    public async Task<ActionResult<OrderDto>> CreateOrder(CreateOrderDto orderDto)
     {
         var basket = await context.Baskets.GetBasketWithItems(Request.Cookies["basketId"]);
         if (basket == null || basket.Items.Count == 0 || string.IsNullOrEmpty(basket.PaymentIntentId))
@@ -72,7 +73,7 @@ public class OrdersController(StoreContext context) : BaseApiController
             return BadRequest("Problem creating order");
         }
 
-        return CreatedAtAction(nameof(GetOrderDetails), new { id = order.Id }, order);
+        return CreatedAtAction(nameof(GetOrderDetails), new { id = order.Id }, order.ToDto());
     }
 
     private long CalculateDeliveryFee(long subtotal)
