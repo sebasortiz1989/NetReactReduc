@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApiStore.Entities.OrderAggregate;
@@ -5,8 +6,12 @@ namespace WebApiStore.Entities.OrderAggregate;
 [Owned]
 public class PaymentSummary
 {
-    public int Last4Digits { get; set; }
-    public required string CardBrand { get; set; }
-    public int ExpiryMonth { get; set; }
-    public int ExpiryYear { get; set; }
+    public int Last4 { get; set; }
+    public required string Brand { get; set; }
+    
+    [JsonPropertyName("exp_month")]
+    public int ExpMonth { get; set; }
+    
+    [JsonPropertyName("exp_year")]
+    public int ExpYear { get; set; }
 }

@@ -1,7 +1,6 @@
 import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQueryWithErrorHandling} from "../../app/api/baseAPI.ts";
-import type {Order} from "@stripe/stripe-js";
-import type {CreateOrder} from "../../app/models/Order.ts";
+import type {Order, CreateOrder} from "../../app/models/Order.ts";
 
 export const orderApi = createApi({
     reducerPath: 'orderApi',
@@ -13,7 +12,7 @@ export const orderApi = createApi({
         fetchOrderDetailed: builder.query<Order, number>({
             query: (orderId) => ({ url: `orders/${orderId}` }),
         }),
-        createOrder: builder.query<Order, CreateOrder>({
+        createOrder: builder.mutation<Order, CreateOrder>({
             query: (order) => ({
                 url: 'orders',
                 method: 'POST',
@@ -23,4 +22,4 @@ export const orderApi = createApi({
     })
 })
 
-export const {useFetchOrdersQuery, useFetchOrderDetailedQuery, useCreateOrderQuery} = orderApi;
+export const {useFetchOrdersQuery, useFetchOrderDetailedQuery, useCreateOrderMutation} = orderApi;

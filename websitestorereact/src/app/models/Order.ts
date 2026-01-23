@@ -1,4 +1,4 @@
-export interface Root {
+export interface Order {
     id: number
     buyerEmail: string
     shippingAddress: ShippingAddress
@@ -15,7 +15,7 @@ export interface Root {
 export interface ShippingAddress {
     name: string
     line1: string
-    line2?: string
+    line2?: string | null
     city: string
     state: string
     postal_code: string
@@ -31,10 +31,10 @@ export interface OrderItem {
 }
 
 export interface PaymentSummary {
-    last4Digits: number
-    cardBrand: string
-    expiryMonth: number
-    expiryYear: number
+    last4: number | string
+    brand: string
+    exp_month: number
+    exp_year: number
 }
 
 export interface CreateOrder {
