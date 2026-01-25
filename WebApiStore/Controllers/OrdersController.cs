@@ -50,23 +50,34 @@ public class OrdersController(StoreContext context) : BaseApiController
         {
             return BadRequest("Some products are out of stock");
         }
-        
+
         var subtotal = items.Sum(item => item.Price * item.Quantity);
         var deliveryFee = CalculateDeliveryFee(subtotal);
-        var order = new Order
-        {
-            BuyerEmail = User.GetUserName(),
-            OrderItems = items,
-            ShippingAddress = orderDto.ShippingAddress,
-            Subtotal = subtotal,
-            DeliveryFee = deliveryFee,
-            PaymentSummary = orderDto.PaymentSummary,
-            PaymentIntentId = basket.PaymentIntentId,
-        };
 
-        context.Orders.Add(order);
-        context.Baskets.Remove(basket);
-        Response.Cookies.Delete("basketId");
+        var order = await context.Orders
+            .Include(x => x.OrderItems)
+            .FirstOrDefaultAsync(x => x.PaymentIntentId == basket.PaymentIntentId);
+
+        if (order == null)
+        {
+            order = new Order
+            {
+                BuyerEmail = User.GetUserName(),
+                OrderItems = items,
+                ShippingAddress = orderDto.ShippingAddress,
+                Subtotal = subtotal,
+                DeliveryFee = deliveryFee,
+                PaymentSummary = orderDto.PaymentSummary,
+                PaymentIntentId = basket.PaymentIntentId,
+            };
+
+            context.Orders.Add(order);
+        }
+        else
+        {
+            order.OrderItems = items;
+        }
+
         var result = await context.SaveChangesAsync() > 0;
         if (!result)
         {
