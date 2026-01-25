@@ -1,7 +1,7 @@
 import {Box, Button, Container, Divider, Paper, Typography} from "@mui/material";
 import {Link, useLocation} from "react-router-dom";
 import type {Order} from "../../app/models/Order.ts";
-import {currencyFormat} from "../../lib/util.ts";
+import {cardInfoFormat, currencyFormat, shippingAddressFormat} from "../../lib/util.ts";
 
 export default function CheckoutSuccess() {
     const {state} = useLocation();
@@ -17,12 +17,12 @@ export default function CheckoutSuccess() {
 
     const addressString = () => {
         const address = order.shippingAddress;
-        return `${address?.name}, ${address?.line1}, ${address?.line2 ? address?.line2 + ', ' : ''}${address?.city}, ${address?.state ? address?.state + ', ' : ''}${address?.postal_code}, ${address?.country}`
+        return shippingAddressFormat(address);
     }
 
     const paymentString = () => {
         const card = order.paymentSummary;
-        return `${card?.brand?.toLocaleUpperCase()}, **** **** **** ${card?.last4}, exp: ${card?.exp_month}/${card?.exp_year}`;
+        return cardInfoFormat(card);
     }
     
     return (

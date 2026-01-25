@@ -14,6 +14,7 @@ import RegisterForm from "../../features/account/RegisterForm.tsx";
 import RequireAuth from "./RequireAuth.tsx";
 import CheckoutSuccess from "../../features/checkout/CheckoutSuccess.tsx";
 import OrdersPage from "../../features/orders/OrdersPage.tsx";
+import OrderDetailedPage from "../../features/orders/OrderDetailedPage.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
                     {path: '/checkout', element: <CheckoutPage/>},
                     {path: '/checkout/success', element: <CheckoutSuccess/>},
                     {path: 'orders', element: <OrdersPage/>},
+                    {path: 'orders/:id', element: <OrderDetailedPage/>},
                 ]},
             {path: "", element: <HomePage/>},
             {path: 'catalog', element: <Catalog/>},
