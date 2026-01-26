@@ -29,6 +29,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleWare>();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseCors(opt =>
 {
     opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(
@@ -44,6 +48,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>(); // With this I add endpoints. api/login
+app.MapFallbackToController("Index", "Fallback");
 
 
 DbInitializer.InitDb(app);
