@@ -64,7 +64,7 @@ public class PaymentsController(PaymentsService paymentsService, StoreContext co
             {
                 await HandlePaymentIntentSucceeded(intent);
             }
-            else if (intent.Status == "payment_failed")
+            else
             {
                 await HandlePaymentIntentFailed(intent);
             }
