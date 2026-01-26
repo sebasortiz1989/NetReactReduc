@@ -8,6 +8,11 @@ export default defineConfig(({ mode }) => {
   const isLan = mode === 'lan';
 
   return {
+    build: {
+      outDir: '../WebApiStore/wwwroot',
+      chunkSizeWarningLimit: 1024,
+      emptyOutDir: true,
+    },
     server: {
       port: 3000,
       host: true // Always allow network access

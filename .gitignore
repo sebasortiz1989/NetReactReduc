@@ -49,3 +49,5 @@ nunit-*.xml
 
 appsettings.json
 WebApiStore/appsettings.json
+websitestorereact/.env.production
+WebApiStore/wwwroot/
