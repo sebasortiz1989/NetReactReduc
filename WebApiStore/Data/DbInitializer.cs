@@ -6,16 +6,16 @@ namespace WebApiStore.Data;
 
 public class DbInitializer
 {
-    public static void InitDb(WebApplication app)
+    public static async Task InitDb(WebApplication app)
     {
         // These guarantees that after we finish with this resource it will be disposed
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<StoreContext>() ?? throw new InvalidOperationException("Failed to create StoreContext");
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>() ?? throw new InvalidOperationException("Failed to create UserManager");
-        SeedData(context, userManager);
+        await SeedData(context, userManager);
     }
 
-    private static async void SeedData(StoreContext context, UserManager<User> userManager)
+    private static async Task SeedData(StoreContext context, UserManager<User> userManager)
     {
         try
         {
