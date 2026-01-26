@@ -127,6 +127,7 @@ export const basketApi = createApi({
                     basketApi.util.updateQueryData('fetchBasket', undefined, (draft) => {
                         if (!draft) return;
                         draft.items = [];
+                        draft.basketId = '';
                     })
                 );
                 Cookies.remove('basketId');

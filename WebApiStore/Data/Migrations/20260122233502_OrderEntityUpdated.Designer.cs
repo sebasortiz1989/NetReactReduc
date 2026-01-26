@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiStore.Data;
 
@@ -10,9 +11,11 @@ using WebApiStore.Data;
 namespace WebApiStore.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260122233502_OrderEntityUpdated")]
+    partial class OrderEntityUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -484,19 +487,17 @@ namespace WebApiStore.Data.Migrations
                             b1.Property<int>("OrderId")
                                 .HasColumnType("INTEGER");
 
-                            b1.Property<string>("Brand")
+                            b1.Property<string>("CardBrand")
                                 .IsRequired()
                                 .HasColumnType("TEXT");
 
-                            b1.Property<int>("ExpMonth")
-                                .HasColumnType("INTEGER")
-                                .HasJsonPropertyName("exp_month");
+                            b1.Property<int>("ExpiryMonth")
+                                .HasColumnType("INTEGER");
 
-                            b1.Property<int>("ExpYear")
-                                .HasColumnType("INTEGER")
-                                .HasJsonPropertyName("exp_year");
+                            b1.Property<int>("ExpiryYear")
+                                .HasColumnType("INTEGER");
 
-                            b1.Property<int>("Last4")
+                            b1.Property<int>("Last4Digits")
                                 .HasColumnType("INTEGER");
 
                             b1.HasKey("OrderId");

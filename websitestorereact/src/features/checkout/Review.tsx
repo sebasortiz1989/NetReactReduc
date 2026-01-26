@@ -1,4 +1,4 @@
-import {Box, Divider, Table, TableBody, TableCell, TableRow, Typography} from "@mui/material";
+import {Box, Divider, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from "@mui/material";
 import {currencyFormat} from "../../lib/util.ts";
 import type {ConfirmationToken} from "@stripe/stripe-js";
 import {useBasket} from "../../lib/hooks/useBasket.ts";
@@ -47,29 +47,31 @@ export default function Review({confirmationToken} : Props) {
             
             <Box mt={6} mx='auto'>
                 <Divider />
-                <Table>
-                    <TableBody>
-                        {basket?.items.map(item => (
-                            <TableRow key={item.productId} sx={{borderBottom: '1px solid rgba24, 224, 224, 1)'}}>
-                                <TableCell sx={{py: 4}}>
-                                    <Box display='flex' gap={3} alignItems='center'>
-                                        <img
-                                            src={item.pictureUrl}
-                                            alt={item.name}
-                                            style={{width: 40, height: 40}}
-                                        />
-                                        <Typography>
-                                            {item.name}
-                                        </Typography>
-                                    </Box>
-                                </TableCell>
-                                <TableCell align='center' sx={{p:4}}>
-                                    {currencyFormat(item.price)}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                <TableContainer>
+                    <Table>
+                        <TableBody>
+                            {basket?.items.map(item => (
+                                <TableRow key={item.productId} sx={{borderBottom: '1px solid rgba24, 224, 224, 1)'}}>
+                                    <TableCell sx={{py: 4}}>
+                                        <Box display='flex' gap={3} alignItems='center'>
+                                            <img
+                                                src={item.pictureUrl}
+                                                alt={item.name}
+                                                style={{width: 40, height: 40}}
+                                            />
+                                            <Typography>
+                                                {item.name}
+                                            </Typography>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell align='center' sx={{p:4}}>
+                                        {currencyFormat(item.price)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             </Box>
         </div>
     )

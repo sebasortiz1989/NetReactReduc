@@ -46,7 +46,6 @@ export default function CheckoutPage() {
                         <CheckoutStepper/>
                     </Elements>
                 )}
-
             </Grid>
             <Grid size={4}>
                 <OrderSummary/>

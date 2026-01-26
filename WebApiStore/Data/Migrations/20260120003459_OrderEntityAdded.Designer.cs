@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiStore.Data;
 
@@ -10,9 +11,11 @@ using WebApiStore.Data;
 namespace WebApiStore.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20260120003459_OrderEntityAdded")]
+    partial class OrderEntityAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -265,7 +268,6 @@ namespace WebApiStore.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PaymentIntentId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
@@ -288,10 +290,10 @@ namespace WebApiStore.Data.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Price")
+                    b.Property<long>("price")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("quantity")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -484,19 +486,17 @@ namespace WebApiStore.Data.Migrations
                             b1.Property<int>("OrderId")
                                 .HasColumnType("INTEGER");
 
-                            b1.Property<string>("Brand")
+                            b1.Property<string>("CardBrand")
                                 .IsRequired()
                                 .HasColumnType("TEXT");
 
-                            b1.Property<int>("ExpMonth")
-                                .HasColumnType("INTEGER")
-                                .HasJsonPropertyName("exp_month");
+                            b1.Property<int>("ExpiryMonth")
+                                .HasColumnType("INTEGER");
 
-                            b1.Property<int>("ExpYear")
-                                .HasColumnType("INTEGER")
-                                .HasJsonPropertyName("exp_year");
+                            b1.Property<int>("ExpiryYear")
+                                .HasColumnType("INTEGER");
 
-                            b1.Property<int>("Last4")
+                            b1.Property<int>("Last4Digits")
                                 .HasColumnType("INTEGER");
 
                             b1.HasKey("OrderId");
