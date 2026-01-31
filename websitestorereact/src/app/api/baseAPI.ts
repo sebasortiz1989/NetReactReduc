@@ -4,7 +4,9 @@ import {toast} from "react-toastify";
 import {router} from "../routes/Routes.tsx";
 
 const isLocalhost = window.location.hostname === 'localhost';
-const baseUrl = isLocalhost ? import.meta.env.VITE_API_URL : `https://${window.location.hostname}:5010/api`
+let baseUrl = isLocalhost ? import.meta.env.VITE_API_URL : `https://${window.location.hostname}:5010/api`;
+const isDev = import.meta?.env?.DEV;
+baseUrl = isDev ? baseUrl : "/api";
 
 const customBaseQuery = fetchBaseQuery({
     baseUrl: baseUrl,
