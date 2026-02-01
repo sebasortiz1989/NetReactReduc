@@ -14,6 +14,7 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddCors();
+builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<ExceptionMiddleWare>();
 builder.Services.AddScoped<PaymentsService>();
 builder.Services.AddIdentityApiEndpoints<User>(options =>
