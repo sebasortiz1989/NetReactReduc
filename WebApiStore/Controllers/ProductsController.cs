@@ -7,11 +7,12 @@ using WebApiStore.DTOs;
 using WebApiStore.Entities;
 using WebApiStore.Extensions;
 using WebApiStore.RequestHelpers;
+using WebApiStore.Services;
 
 namespace WebApiStore.Controllers;
 
 // https://localhost:5000/api/products
-public class ProductsController(StoreContext context, IMapper mapper) : BaseApiController
+public class ProductsController(StoreContext context, IMapper mapper, ImageService imageService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<List<Product>>> GetProducts([FromQuery]ProductParams productParams)
@@ -48,6 +49,17 @@ public class ProductsController(StoreContext context, IMapper mapper) : BaseApiC
     public async Task<ActionResult<Product>> CreateProduct(CreateProductDto productDto)
     {
         var product = mapper.Map<Product>(productDto);
+
+        if (productDto.File != null)
+        {
+            var imageResult = await imageService.AddImageAsync(productDto.File);
+
+            if (imageResult.Error != null)
+                return BadRequest(imageResult.Error.Message);
+
+            product.PictureUrl = imageResult.SecureUrl.AbsoluteUri;
+            product.PublicId = imageResult.PublicId;
+        }
         
         context.Products.Add(product);
         var result = await context.SaveChangesAsync() > 0;

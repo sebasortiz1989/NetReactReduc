@@ -9,7 +9,7 @@ using WebApiStore.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options =>
 {
@@ -19,6 +19,7 @@ builder.Services.AddCors();
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<ExceptionMiddleWare>();
 builder.Services.AddScoped<PaymentsService>();
+builder.Services.AddScoped<ImageService>();
 builder.Services.AddIdentityApiEndpoints<User>(options =>
 {
     options.User.RequireUniqueEmail = true;
