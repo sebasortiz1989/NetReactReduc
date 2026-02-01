@@ -3,11 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
 using WebApiStore.Entities;
 using WebApiStore.Middleware;
+using WebApiStore.RequestHelpers;
 using WebApiStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options =>
 {

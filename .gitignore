@@ -50,3 +50,4 @@ nunit-*.xml
 appsettings.json
 WebApiStore/appsettings.json
 WebApiStore/wwwroot/
+WebApiStore/appSettings.json
