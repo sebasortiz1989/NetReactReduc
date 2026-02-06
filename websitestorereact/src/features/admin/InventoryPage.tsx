@@ -5,17 +5,24 @@ import {currencyFormat} from "../../lib/util.ts";
 import {Delete, Edit} from "@mui/icons-material";
 import AppPagination from "../../app/shared/components/AppPagination.tsx";
 import {setPageNumber} from "../catalog/catalogSlice.ts";
+import {useState} from "react";
+import ProductForm from "./ProductForm.tsx";
 
 export default function InventoryPage() {
     const productParams = useAppSelector(state => state.catalogApi);
     const {data} = useFetchProductsQuery(productParams);
     const dispatch = useAppDispatch();
+    const [editMode, setEditMode] = useState(false);
+    
+    if (editMode) {
+        return <ProductForm/>
+    }
     
     return (
         <>
             <Box display="flex" justifyContent="space-between">
                 <Typography variant="h4" sx={{p: 2}}>Inventory</Typography>
-                <Button variant="contained" size='large' sx={{m: 2}}>Create</Button>
+                <Button variant="contained" size='large' sx={{m: 2}} onClick={() => setEditMode(true)}>Create</Button>
             </Box>
             <TableContainer component={Paper}>
                 <Table sx={{minWidth: 650}}>
