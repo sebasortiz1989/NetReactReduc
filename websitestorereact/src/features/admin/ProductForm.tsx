@@ -1,11 +1,12 @@
 import {type CreateProductSchema, createProductSchema} from "../../lib/schemas/screateProductSchema.ts";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Box, Button, Grid, Paper, TextField, Typography} from "@mui/material";
-import {Controller, useForm} from "react-hook-form";
+import {Box, Button, Grid, Paper, Typography} from "@mui/material";
+import {useForm} from "react-hook-form";
+import AppTextInput from "../../app/shared/components/AppTextInput.tsx";
 
 export default function ProductForm() {
     const { control, handleSubmit } = useForm({
-        mode: 'onTouched',
+        // mode: 'onTouched',
         resolver: zodResolver(createProductSchema),
     });
   
@@ -21,12 +22,7 @@ export default function ProductForm() {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Grid container spacing={3}>
                     <Grid size={12}>
-                        <Controller
-                            render={({field}) => <TextField {...field} fullWidth label='name' />}
-                            name="name"
-                            control={control}
-                            defaultValue=""
-                        />
+                        <AppTextInput control={control} label="Product Name" name="name"/>
                     </Grid>
                 </Grid>
                 <Box display="flex" justifyContent="space-between" sx={{mt: 3}}>
