@@ -6,9 +6,16 @@ import AppTextInput from "../../app/shared/components/AppTextInput.tsx";
 import {useFetchFiltersQuery} from "../catalog/catalogApi.ts";
 import AppSelectInput from "../../app/shared/components/AppSelectInput.tsx";
 import AppDropZone from "../../app/shared/components/AppDropZone.tsx";
+import type {Product} from "../../app/models/Product.ts";
+import {useEffect} from "react";
 
-export default function ProductForm() {
-    const { control, handleSubmit, watch } = useForm({
+type Props = {
+    setEditMode: (editMode: boolean) => void;
+    product: Product | null;
+}
+
+export default function ProductForm({setEditMode, product}: Props) {
+    const { control, handleSubmit, watch, reset } = useForm({
         mode: 'onTouched',
         resolver: zodResolver(createProductSchema),
     });
@@ -19,6 +26,19 @@ export default function ProductForm() {
     const onSubmit = (data: CreateProductSchema) => {
         console.log(data);
     }
+    
+    useEffect(() => {
+        if (product) {
+            reset({
+                name: product.name,
+                brand: product.brand,
+                type: product.type,
+                price: product.price,
+                quantity: product.quantityInStock,
+                description: product.description,
+            })
+        }
+    }, [product, reset]);
     
     return (
         <Box component={Paper} sx={{p: 4, maxWidth: 'lg', mx: 'auto'}}>
@@ -62,13 +82,15 @@ export default function ProductForm() {
                     </Grid>
                     <Grid size={12} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                         <AppDropZone control={control} name="file"/>
-                        {watchFile && (
+                        {watchFile ? (
                             <img src={watchFile.preview} alt="preview of image" style={{maxHeight: 200}}/>
+                        ) : (
+                            <img src={product?.pictureUrl} alt="preview of image" style={{maxHeight: 200}}/>
                         )}
                     </Grid>
                 </Grid>
                 <Box display="flex" justifyContent="space-between" sx={{mt: 3}}>
-                    <Button variant="contained" color='inherit'>Cancel</Button>
+                    <Button onClick={() => setEditMode(false)} variant="contained" color='inherit'>Cancel</Button>
                     <Button variant="contained" color='success' type="submit">Submit</Button>
                 </Box>
             </form>
