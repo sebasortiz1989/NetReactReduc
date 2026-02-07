@@ -84,7 +84,7 @@ export default function ProductForm({setEditMode, product}: Props) {
                         <AppDropZone control={control} name="file"/>
                         {watchFile ? (
                             <img src={watchFile.preview} alt="preview of image" style={{maxHeight: 200}}/>
-                        ) : (
+                        ) : product?.pictureUrl && (
                             <img src={product?.pictureUrl} alt="preview of image" style={{maxHeight: 200}}/>
                         )}
                     </Grid>
