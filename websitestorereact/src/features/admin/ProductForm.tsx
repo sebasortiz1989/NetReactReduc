@@ -23,26 +23,21 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
         mode: 'onTouched',
         resolver: zodResolver(createProductSchema),
     });
-    
-    const watchFile = watch('file');
+
+    type FileWithPreview = File & { preview: string };
+
+    const watchFile = watch('file') as FileWithPreview | undefined;
     const {data} = useFetchFiltersQuery();
     const [createProduct] = useCreateProductMutation();
     const [updateProduct] = useUpdateProductMutation();
     
     useEffect(() => {
         if (product) {
-            reset({
-                name: product.name,
-                brand: product.brand,
-                type: product.type,
-                price: product.price,
-                quantity: product.quantityInStock,
-                description: product.description,
-            })
+            reset(product)
         }
-        
+
         return () => {
-            if (watchFile) {
+            if (watchFile?.preview) {
                 URL.revokeObjectURL(watchFile.preview);
             }
         }
@@ -51,24 +46,40 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
     const createFormData = (items: FieldValues) => {
         const formData = new FormData();
         for (const key in items) {
-            formData.append(key, items[key]);
+            if (!Object.prototype.hasOwnProperty.call(items, key)) continue;
+
+            // don't append the file from the generic loop; append it explicitly below
+            if (key === 'file') continue;
+
+            const value = items[key];
+            if (value === null || value === undefined) continue;
+
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                formData.append(key, String(value));
+                continue;
+            }
+
+            // Fallback: stringify unknown objects to avoid FormData.append crashing
+            formData.append(key, JSON.stringify(value));
         }
         return formData;
     }
-    
+
     const onSubmit = async (data: CreateProductSchema) => {
         try {
             const formData = createFormData(data);
-            
-            if (watchFile)
-                formData.append('file', watchFile);
-            
+
+            if (watchFile instanceof File) {
+                // send the actual File, not the extended preview property
+                formData.append('file', watchFile, watchFile.name);
+            }
+
             if (product) {
                 await updateProduct({id: product.id, data: formData}).unwrap();
             } else {
                 await createProduct(formData).unwrap();
             }
-            
+
             setEditMode(false);
             setSelectedProduct(null);
             refetch();

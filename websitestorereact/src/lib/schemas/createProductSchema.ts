@@ -16,7 +16,7 @@ export const createProductSchema = z.object({
     type: z.string({error: "Product type is required"}),
     pictureUrl: z.string().optional(),
     file: fileSchema.optional(),
-}).refine((data) => !data.pictureUrl && !data.file, {
+}).refine((data) => data.pictureUrl || data.file, {
     message: "Please provide an image",
     path: ['file']
 });
