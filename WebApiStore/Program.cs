@@ -7,13 +7,14 @@ using WebApiStore.RequestHelpers;
 using WebApiStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Add services to the container.
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(defaultConnection);
 });
 builder.Services.AddCors();
 builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
@@ -30,6 +31,9 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
 .AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
+var startupLogger = app.Logger;
+
+startupLogger.LogInformation("Application starting in {Environment}. DefaultConnection configured: {HasDefaultConnection}", app.Environment.EnvironmentName, !string.IsNullOrWhiteSpace(defaultConnection));
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleWare>();
@@ -54,7 +58,16 @@ app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>(); // With this I add endpoints. api/login
 app.MapFallbackToController("Index", "Fallback");
 
-
-await DbInitializer.InitDb(app);
+try
+{
+    startupLogger.LogInformation("Starting database initialization");
+    await DbInitializer.InitDb(app);
+    startupLogger.LogInformation("Database initialization completed successfully");
+}
+catch (Exception ex)
+{
+    startupLogger.LogError(ex, "Database initialization failed during startup in {Environment}", app.Environment.EnvironmentName);
+    throw;
+}
 
 app.Run();

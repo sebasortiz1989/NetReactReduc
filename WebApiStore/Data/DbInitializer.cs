@@ -10,17 +10,24 @@ public class DbInitializer
     {
         // These guarantees that after we finish with this resource it will be disposed
         using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<DbInitializer>>();
+        logger.LogInformation("Creating scope for database initialization");
+
         var context = scope.ServiceProvider.GetRequiredService<StoreContext>() ?? throw new InvalidOperationException("Failed to create StoreContext");
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>() ?? throw new InvalidOperationException("Failed to create UserManager");
-        await SeedData(context, userManager);
+
+        await SeedData(context, userManager, logger);
     }
 
-    private static async Task SeedData(StoreContext context, UserManager<User> userManager)
+    private static async Task SeedData(StoreContext context, UserManager<User> userManager, ILogger logger)
     {
+        logger.LogInformation("Applying EF Core migrations");
         await context.Database.MigrateAsync();
+        logger.LogInformation("EF Core migrations applied successfully");
 
         if (!userManager.Users.Any())
         {
+            logger.LogInformation("Seeding default users and roles");
             var user = new User
             {
                 UserName = "seba@test.com",
@@ -39,10 +46,14 @@ public class DbInitializer
             await userManager.CreateAsync(admin, "Pa$$w0rd");
             await userManager.AddToRolesAsync(admin, ["Member", "Admin"]);
         }
-        
-        if (context.Products.Any())
-            return;
 
+        if (context.Products.Any())
+        {
+            logger.LogInformation("Products already seeded");
+            return;
+        }
+
+        logger.LogInformation("Seeding default products");
         var products = new List<Product>
         {
             new()
@@ -245,5 +256,6 @@ public class DbInitializer
 
         context.Products.AddRange(products);
         await context.SaveChangesAsync();
+        logger.LogInformation("Default products seeded successfully");
     }
 }
