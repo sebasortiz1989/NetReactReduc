@@ -9,7 +9,6 @@ import {catalogSlice} from "../../features/catalog/catalogSlice.ts";
 import {accountApi} from "../../features/account/accountApi.ts";
 import {checkoutApi} from "../../features/checkout/checkoutApi.ts";
 import {orderApi} from "../../features/orders/orderApi.ts";
-import {adminApi} from "../../features/admin/adminApi.ts";
 
 export function configureTheStore() {
     return legacy_createStore(counterReducer);
@@ -23,7 +22,6 @@ export const store = configureStore({
         [accountApi.reducerPath]: accountApi.reducer,
         [checkoutApi.reducerPath]: checkoutApi.reducer,
         [orderApi.reducerPath]: orderApi.reducer,
-        [adminApi.reducerPath]: adminApi.reducer,
         counter: counterSlice.reducer,
         ui: uiSlice.reducer,
         catalogApi: catalogSlice.reducer,
@@ -35,8 +33,7 @@ export const store = configureStore({
             basketApi.middleware,
             accountApi.middleware,
             checkoutApi.middleware,
-            orderApi.middleware,
-            adminApi.middleware),
+            orderApi.middleware),
 });
 
 // This comes from the documentation of Redux Toolkit

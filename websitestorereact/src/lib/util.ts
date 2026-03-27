@@ -1,5 +1,4 @@
 import type {PaymentSummary, ShippingAddress} from "../app/models/Order.ts";
-import type {FieldValues, Path, UseFormSetError} from "react-hook-form";
 
 export function shippingAddressFormat(address: ShippingAddress): string {
     if (!address) return '';
@@ -27,23 +26,4 @@ export function filterEmptyValues(values: Record<string, unknown>) {
             return true; // keep numbers/booleans/objects
         })
     );
-}
-
-export function handleApiError<T extends FieldValues>(
-    error: unknown,
-    setError: UseFormSetError<T>,
-    fieldNames: Path<T>[]
-) {
-    const apiError = error as { message: string } || {};
-    if (apiError.message && typeof apiError.message === 'string') {
-        const errorArray = apiError.message.split(',');
-        errorArray.forEach((error) => {
-            const matchedField = fieldNames.find(
-                (fieldName) => error.toLowerCase().includes(fieldName.toString().toLowerCase()));
-            
-            if (matchedField) {
-                setError(matchedField, {message: error.trim()});
-            }
-        })
-    }
 }

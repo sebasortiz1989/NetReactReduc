@@ -2,7 +2,7 @@ import {Button, Divider, Fade, ListItemIcon, ListItemText, Menu, MenuItem} from 
 import {useState} from "react";
 import * as React from "react";
 import type {User} from "../models/User.ts";
-import {Person, History, Logout, Inventory} from "@mui/icons-material";
+import { Person, History, Logout } from "@mui/icons-material";
 import {useLogoutMutation} from "../../features/account/accountApi.ts";
 import {Link} from "react-router-dom";
 
@@ -62,15 +62,6 @@ export default function UserMenu({user}:Props) {
                     </ListItemText>
                 </MenuItem>
 
-                <MenuItem component={Link} to='/inventory'>
-                    <ListItemIcon>
-                        <Inventory/>
-                    </ListItemIcon>
-                    <ListItemText>
-                        Inventory
-                    </ListItemText>
-                </MenuItem>
-                
                 <Divider/>
                 
                 <MenuItem onClick={logout}>
