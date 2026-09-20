@@ -47,7 +47,7 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-appsettings.json
-WebApiStore/appsettings.json
+# appsettings.json   # now committed WITHOUT secrets; real values live in user-secrets / env vars
+# WebApiStore/appsettings.json   # now committed WITHOUT secrets; real values live in user-secrets / env vars
 WebApiStore/wwwroot/
-WebApiStore/appSettings.json
+# WebApiStore/appSettings.json   # now committed WITHOUT secrets; real values live in user-secrets / env vars

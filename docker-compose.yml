@@ -1,14 +1,19 @@
 services:
-    sql:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        container_name: sql_server
+    postgres:
+        image: postgres:17-alpine
+        container_name: store_postgres
         environment:
-            ACCEPT_EULA: "Y"
-            MSSQL_SA_PASSWORD: "Password@1"
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: Password@1
+            POSTGRES_DB: shop
         ports:
-            - "1433:1433"
+            - "5432:5432"
         volumes:
-            - sql_data:/var/opt/mssql
-        platform: linux/amd64
+            - pg_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d shop"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
 volumes:
-    sql_data:
+    pg_data:

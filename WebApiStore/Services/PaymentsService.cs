@@ -18,7 +18,7 @@ public class PaymentsService(IConfiguration config)
             var options = new PaymentIntentCreateOptions
             {
                 Amount = subTotal + deliveryFee,
-                Currency = "brl",
+                Currency = "usd", // must match currencyFormat() on the client (lib/util.ts)
                 PaymentMethodTypes = ["card"],
             };
 

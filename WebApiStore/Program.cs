@@ -17,7 +17,7 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(options =>
 {
-    options.UseSqlServer(defaultConnection);
+    options.UseNpgsql(defaultConnection);
 });
 builder.Services.AddCors();
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;

@@ -1,0 +1,45 @@
+# Single image: the React SPA is built into the API's wwwroot, and ASP.NET Core
+# serves both (UseStaticFiles + MapFallbackToController). Same origin, so the
+# auth/basket cookies work without SameSite=None and there is one cold start.
+#
+# NO SECRETS BELONG IN THIS FILE. Connection strings and API keys are supplied
+# at runtime as Vercel environment variables (see README).
+
+# ---------- stage 1: build the React client ----------
+FROM node:22-alpine AS client
+WORKDIR /src
+
+COPY websitestorereact/package.json websitestorereact/package-lock.json ./websitestorereact/
+RUN cd websitestorereact && npm ci
+
+COPY websitestorereact/ ./websitestorereact/
+# vite.config.ts writes to ../WebApiStore/wwwroot, so that path must exist.
+RUN mkdir -p WebApiStore/wwwroot && cd websitestorereact && npm run build
+
+# ---------- stage 2: publish the .NET API ----------
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS api
+WORKDIR /src
+
+COPY WebApiStore/WebApiStore.csproj ./WebApiStore/
+RUN dotnet restore WebApiStore/WebApiStore.csproj
+
+COPY WebApiStore/ ./WebApiStore/
+# The built SPA from stage 1, placed where UseStaticFiles expects it.
+COPY --from=client /src/WebApiStore/wwwroot ./WebApiStore/wwwroot
+RUN dotnet publish WebApiStore/WebApiStore.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+# ---------- stage 3: runtime ----------
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
+WORKDIR /app
+COPY --from=api /app/publish ./
+
+# Vercel routes traffic to port 80 unless PORT is set in project settings.
+ENV ASPNETCORE_HTTP_PORTS=80 \
+    ASPNETCORE_ENVIRONMENT=Production
+EXPOSE 80
+
+# Run as a non-root user.
+RUN adduser -D -u 1001 appuser && chown -R appuser /app
+USER appuser
+
+ENTRYPOINT ["dotnet", "WebApiStore.dll"]

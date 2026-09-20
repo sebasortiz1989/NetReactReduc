@@ -42,15 +42,15 @@ dotnet ef database drop
 
 Prerequisites: .NET 10 SDK, Node 20+, Docker (OrbStack or Docker Desktop).
 
-**1. Start SQL Server** (the app has no local SQL Server; it runs in a container):
+**1. Start PostgreSQL** (runs in a container; nothing to install):
 
 ```
 docker compose up -d
 ```
 
 The connection string in `WebApiStore/appsettings.Development.json` points at
-`localhost,1433` with the `sa` password from `docker-compose.yml`. The container
-keeps its data in the `sql_data` volume, so the database survives restarts.
+`localhost:5432` with the password from `docker-compose.yml`. The container keeps
+its data in the `pg_data` volume, so the database survives restarts.
 
 **2. Supply your own secrets.** No credentials are committed to this repository.
 Stripe and Cloudinary keys are read from .NET user secrets, which live outside the
@@ -111,3 +111,31 @@ if you use `dotnet watch` to run the project, you can take advantage of hot relo
 6. You see the result instantly in the browser.
 
 if you user `dotnet run` to run the project, you will need to stop and restart the application to see any changes you make to the code.
+# Deploying to Vercel
+
+The app deploys as a **single container**: `Dockerfile.vercel` builds the React
+client into `WebApiStore/wwwroot`, and ASP.NET Core serves both the SPA and the
+API from one origin. That keeps the auth and basket cookies first-party.
+
+Build and run it locally exactly as Vercel does:
+
+```
+docker build -f Dockerfile.vercel -t restore .
+docker run -p 8080:80 \
+  -e "ConnectionStrings__DefaultConnection=Host=...;Database=...;Username=...;Password=..." \
+  restore
+```
+
+**No secrets are baked into the image** - `.dockerignore` keeps
+`appsettings.Development.json`, `.env` and local databases out of the build
+context. Supply these as Vercel environment variables instead:
+
+| Variable | Notes |
+|---|---|
+| `ConnectionStrings__DefaultConnection` | Postgres connection string (e.g. Neon) |
+| `StripeSettings__SecretKey` | Checkout only |
+| `StripeSettings__WhSecret` | Webhook signature verification |
+| `CloudinarySettings__CloudName` / `__ApiKey` / `__ApiSecret` | Admin image upload only |
+
+Double underscores map to nested configuration keys. Cloudinary is optional: when
+it is not configured the catalogue still works and only image uploads are refused.

@@ -7,7 +7,7 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1433;Database=shop;User Id=sa;Password=Password@1;TrustServerCertificate=True"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=shop;Username=postgres;Password=Password@1"
   },
   "Cors": {
     "AllowedOrigins": [ "https://localhost:3000", "http://localhost:3000" ]

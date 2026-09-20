@@ -1,0 +1,37 @@
+# Keep secrets and local state OUT of the build context entirely, so they can
+# never be baked into a published image layer. Runtime config comes from
+# environment variables instead.
+**/appsettings.Development.json
+**/appsettings.*.Local.json
+**/.env
+**/.env.*
+!**/.env.production
+**/secrets.json
+**/*.pfx
+**/*.key
+**/*.pem
+
+# Local database files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Build output and dependencies (restored/built inside the image)
+**/bin
+**/obj
+**/node_modules
+**/dist
+WebApiStore/wwwroot
+
+# VCS and editor state
+.git
+.gitignore
+.github
+**/.idea
+**/.vscode
+**/*.DotSettings.user
+**/.DS_Store
+
+# Docs and local tooling
+README.md
+docker-compose.yml
