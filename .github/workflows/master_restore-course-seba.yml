@@ -34,15 +34,11 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Build with dotnet
-        run: |
-          cd WebApiStore
-          dotnet build --configuration Release
+      - name: Build backend
+        run: dotnet build ./WebApiStore/WebApiStore.csproj --configuration Release
 
-      - name: dotnet publish
-        run: |
-          cd WebApiStore
-          dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Publish backend
+        run: dotnet publish ./WebApiStore/WebApiStore.csproj --configuration Release --output "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,6 +58,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: ./published-app
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -76,5 +73,5 @@ jobs:
         with:
           app-name: 'restore-course-seba'
           slot-name: 'Production'
-          package: .
-          
+          package: ./published-app
+

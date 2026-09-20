@@ -15,7 +15,7 @@ public class OrderDto
     public long DeliveryFee { get; set; }
     public long Discount { get; set; }
 
-    public string Status { get; set; }
+    public string Status { get; set; } = string.Empty;
 
     public required PaymentSummary PaymentSummary { get; set; }
     public long Total { get; set; }
