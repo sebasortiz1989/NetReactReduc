@@ -14,18 +14,30 @@ export const adminApi = createApi({
                 formData: true,
             }),
         }),
+        // The API exposes PUT on api/products (no {id} segment) and reads the id
+        // from the body, so the id goes in the form data rather than the URL.
         updateProduct: builder.mutation<Product, { id: number; data: FormData }>({
             query: ({ id, data }) => {
-                data.append('id', id.toString());
+                data.set('id', id.toString());
                 return {
-                    url: `products/${id}`,
+                    url: "products",
                     method: "PUT",
                     body: data,
                     formData: true,
                 }
             },
         }),
+        deleteProduct: builder.mutation<void, number>({
+            query: (id) => ({
+                url: `products/${id}`,
+                method: "DELETE",
+            }),
+        }),
     }),
 });
 
-export const { useCreateProductMutation, useUpdateProductMutation } = adminApi;
+export const {
+    useCreateProductMutation,
+    useUpdateProductMutation,
+    useDeleteProductMutation
+} = adminApi;

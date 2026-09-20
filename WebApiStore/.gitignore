@@ -484,3 +484,11 @@ $RECYCLE.BIN/
 *.swp
 
 appsettings.json
+# Per-user Rider/ReSharper settings (contains local paths)
+*.DotSettings.user
+
+# Local SQLite database left over from the pre-SQL Server setup
+*.db
+
+# Local dev overrides - copy appsettings.Development.json.example instead
+appsettings.Development.Local.json

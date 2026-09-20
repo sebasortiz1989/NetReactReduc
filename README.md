@@ -52,7 +52,30 @@ The connection string in `WebApiStore/appsettings.Development.json` points at
 `localhost,1433` with the `sa` password from `docker-compose.yml`. The container
 keeps its data in the `sql_data` volume, so the database survives restarts.
 
-**2. Start the API** (applies EF migrations and seeds on startup):
+**2. Supply your own secrets.** No credentials are committed to this repository.
+Stripe and Cloudinary keys are read from .NET user secrets, which live outside the
+repo in your user profile:
+
+```
+cd WebApiStore
+dotnet user-secrets set "StripeSettings:SecretKey"      "sk_test_..."
+dotnet user-secrets set "StripeSettings:PublishableKey" "pk_test_..."
+dotnet user-secrets set "StripeSettings:WhSecret"       "whsec_..."
+dotnet user-secrets set "CloudinarySettings:CloudName"  "your-cloud-name"
+dotnet user-secrets set "CloudinarySettings:ApiKey"     "your-api-key"
+dotnet user-secrets set "CloudinarySettings:ApiSecret"  "your-api-secret"
+```
+
+Get Stripe test keys from the [Stripe dashboard](https://dashboard.stripe.com/test/apikeys)
+and Cloudinary keys from your [Cloudinary console](https://console.cloudinary.com/).
+Both offer free accounts. Stripe is only needed for checkout, Cloudinary only for
+uploading product images from the admin Inventory page.
+
+`WebApiStore/appsettings.Development.json.example` shows the non-secret settings,
+including `Cors:AllowedOrigins` — add your LAN address there if you run the client
+on another device.
+
+**3. Start the API** (applies EF migrations and seeds on startup):
 
 ```
 cd WebApiStore && dotnet run --launch-profile https
@@ -61,15 +84,20 @@ cd WebApiStore && dotnet run --launch-profile https
 - API: https://localhost:5005 (also http://0.0.0.0:5010 for LAN)
 - Seeded accounts: `admin@test.com` / `seba@test.com`, password `Pa$$w0rd`
 
-**3. Start the React client:**
+**4. Start the React client:**
 
 ```
-cd websitestorereact && npm install && npm run dev
+cd websitestorereact
+cp .env.example .env     # then paste your Stripe publishable key
+npm install && npm run dev
 ```
 
 - Client: https://localhost:3000 (`npm run lan` for plain HTTP on the network)
 
 To reset the database completely: `docker compose down -v`, then start again.
+
+Test checkout uses Stripe's test card `4242 4242 4242 4242`, any future expiry
+and any CVC. No real money moves.
 
 # Hot reload
 

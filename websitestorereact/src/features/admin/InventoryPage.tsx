@@ -7,6 +7,7 @@ import AppPagination from "../../app/shared/components/AppPagination.tsx";
 import {setPageNumber} from "../catalog/catalogSlice.ts";
 import {useState} from "react";
 import ProductForm from "./ProductForm.tsx";
+import {useDeleteProductMutation} from "./adminApi.ts";
 import type {Product} from "../../app/models/Product.ts";
 
 export default function InventoryPage() {
@@ -15,10 +16,21 @@ export default function InventoryPage() {
     const dispatch = useAppDispatch();
     const [editMode, setEditMode] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [deleteProduct, {isLoading: isDeleting}] = useDeleteProductMutation();
     
     const handleSelectProduct = (product: Product) => {
         setSelectedProduct(product);
         setEditMode(true);
+    }
+
+    const handleDeleteProduct = async (id: number) => {
+        try {
+            await deleteProduct(id).unwrap();
+            refetch();
+        } catch (error) {
+            // baseQueryWithErrorHandling has already surfaced this to the user.
+            console.log(error);
+        }
     }
     
     if (editMode) {
@@ -60,7 +72,11 @@ export default function InventoryPage() {
                                 <TableCell align={"center"}>{product.quantityInStock}</TableCell>
                                 <TableCell align={"right"}>
                                     <Button onClick={() => handleSelectProduct(product)} startIcon={<Edit/>}/>
-                                    <Button startIcon={<Delete/>} color={"error"}/>
+                                    <Button
+                                        onClick={() => handleDeleteProduct(product.id)}
+                                        disabled={isDeleting}
+                                        startIcon={<Delete/>}
+                                        color={"error"}/>
                                 </TableCell>
                             </TableRow>
                         ))}

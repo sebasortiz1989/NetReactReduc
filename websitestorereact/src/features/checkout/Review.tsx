@@ -51,7 +51,7 @@ export default function Review({confirmationToken} : Props) {
                     <Table>
                         <TableBody>
                             {basket?.items.map(item => (
-                                <TableRow key={item.productId} sx={{borderBottom: '1px solid rgba24, 224, 224, 1)'}}>
+                                <TableRow key={item.productId} sx={{borderBottom: '1px solid rgba(224, 224, 224, 1)'}}>
                                     <TableCell sx={{py: 4}}>
                                         <Box display='flex' gap={3} alignItems='center'>
                                             <img
@@ -65,7 +65,10 @@ export default function Review({confirmationToken} : Props) {
                                         </Box>
                                     </TableCell>
                                     <TableCell align='center' sx={{p:4}}>
-                                        {currencyFormat(item.price)}
+                                        x {item.quantity}
+                                    </TableCell>
+                                    <TableCell align='right' sx={{p:4}}>
+                                        {currencyFormat(item.price * item.quantity)}
                                     </TableCell>
                                 </TableRow>
                             ))}

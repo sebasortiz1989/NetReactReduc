@@ -1,4 +1,5 @@
 {
+  "_comment": "Copy to appsettings.Development.json. Leave secrets EMPTY here and set them with `dotnet user-secrets` (see README) so they are never committed.",
   "Logging": {
     "LogLevel": {
       "Default": "Information",

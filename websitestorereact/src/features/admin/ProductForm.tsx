@@ -7,7 +7,7 @@ import {useFetchFiltersQuery} from "../catalog/catalogApi.ts";
 import AppSelectInput from "../../app/shared/components/AppSelectInput.tsx";
 import AppDropZone from "../../app/shared/components/AppDropZone.tsx";
 import type {Product} from "../../app/models/Product.ts";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {useCreateProductMutation, useUpdateProductMutation} from "./adminApi.ts";
 import {handleApiError} from "../../lib/util.ts";
 
@@ -31,17 +31,25 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
     const [createProduct] = useCreateProductMutation();
     const [updateProduct] = useUpdateProductMutation();
     
+    // Kept in a ref so revoking the preview on unmount does not require watchFile
+    // as an effect dependency -- it changes identity on every drop, which would
+    // re-run reset(product) and throw away whatever the user had typed.
+    const previewUrlRef = useRef<string | undefined>(undefined);
+    previewUrlRef.current = watchFile?.preview;
+
     useEffect(() => {
         if (product) {
             reset(product)
         }
+    }, [product, reset]);
 
+    useEffect(() => {
         return () => {
-            if (watchFile?.preview) {
-                URL.revokeObjectURL(watchFile.preview);
+            if (previewUrlRef.current) {
+                URL.revokeObjectURL(previewUrlRef.current);
             }
         }
-    }, [product, reset, watchFile]);
+    }, []);
 
     const createFormData = (items: FieldValues) => {
         const formData = new FormData();
@@ -85,7 +93,7 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
             refetch();
         } catch (error) {
             console.log(error);
-            handleApiError<CreateProductSchema>(error, setError, ['brand', 'description', 'file', 'name', 'pictureUrl', 'price', 'quantity', 'type']);
+            handleApiError<CreateProductSchema>(error, setError, ['brand', 'description', 'file', 'name', 'pictureUrl', 'price', 'quantityInStock', 'type']);
         }
     }
     
@@ -119,7 +127,7 @@ export default function ProductForm({setEditMode, product, refetch, setSelectedP
                         <AppTextInput type={"number"} control={control} label="Price in cents" name="price"/>
                     </Grid>
                     <Grid size={6}>
-                        <AppTextInput type={"number"} control={control} label="Quantity in stock" name="quantity"/>
+                        <AppTextInput type={"number"} control={control} label="Quantity in stock" name="quantityInStock"/>
                     </Grid>
                     <Grid size={12}>
                         <AppTextInput

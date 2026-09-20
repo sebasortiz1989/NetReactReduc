@@ -12,7 +12,9 @@ export const createProductSchema = z.object({
     description: z.string({error: "Product description is required"}).min(10, "Description must be at least 10 characters long"),
     price: z.coerce.number({error: "Product price is required"}).min(100, "Price must be at least $1.00"),
     brand: z.string({error: "Product brand is required"}),
-    quantity: z.coerce.number({error: "Product quantity is required"}).min(0, "Quantity cannot be negative"),
+    // Named to match the API contract (UpdateProductDto.QuantityInStock) and the
+    // Product model, so reset(product) populates it and submit round-trips it.
+    quantityInStock: z.coerce.number({error: "Product quantity is required"}).min(0, "Quantity cannot be negative"),
     type: z.string({error: "Product type is required"}),
     pictureUrl: z.string().optional(),
     file: fileSchema.optional(),

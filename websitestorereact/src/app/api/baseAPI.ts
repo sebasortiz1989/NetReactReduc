@@ -40,6 +40,13 @@ const getErrors = (data: unknown): string[] | undefined => {
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 1000));
 
+// Response bodies end up in toasts; keep them to something a human can read.
+const MAX_TOAST_LENGTH = 200;
+const toastError = (message: string) =>
+    toast.error(message.length > MAX_TOAST_LENGTH
+        ? `${message.slice(0, MAX_TOAST_LENGTH)}\u2026`
+        : message);
+
 export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {
     api.dispatch(startLoading());
     
@@ -51,7 +58,7 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
     api.dispatch(stopLoading());
 
     if (result.error) {
-        const status = result.error.status as number;
+        const status = result.error.status as number | string;
         const data = result.error.data as ErrorResponse;
 
         const isFetchBasketRequest =
@@ -67,10 +74,32 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
 
         console.error("API Error:", result.error);
 
+        // fetchBaseQuery reports transport/parse failures with a STRING status, and
+        // their `data` can be a whole HTML document (e.g. the SPA fallback answering
+        // an unmatched API route with 200). Never put that in a toast.
+        if (typeof status === 'string') {
+            switch (status) {
+                case 'FETCH_ERROR':
+                    toastError('Cannot reach the API. Is the server running on ' + baseUrl + '?');
+                    break;
+                case 'TIMEOUT_ERROR':
+                    toastError('The request timed out. Please try again.');
+                    break;
+                case 'PARSING_ERROR': {
+                    const originalStatus = 'originalStatus' in result.error ? result.error.originalStatus : undefined;
+                    toastError(`The server returned an unreadable response (HTTP ${originalStatus ?? 'unknown'}). This usually means the endpoint does not exist.`);
+                    break;
+                }
+                default:
+                    toastError('Unexpected error');
+            }
+            return result;
+        }
+
         switch (status) {
             case 400: {
                 if (typeof data === 'string') {
-                    toast.error(data);
+                    toastError(data);
                     break;
                 }
 
@@ -80,12 +109,12 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
                 }
 
                 const title = getTitle(data);
-                toast.error(title ?? 'Bad request');
+                toastError(title ?? 'Bad request');
                 break;
             }
             case 401: {
                 const title = getTitle(data);
-                toast.error(title ?? 'Unauthorized');
+                toastError(title ?? 'Unauthorized');
                 break;
             }
             case 404:
@@ -95,7 +124,7 @@ export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: 
                 await router.navigate('/server-error', {state: {error: isRecord(data) ? data : null}});
                 break;
             default: {
-                toast.error(typeof data === 'string' ? data : 'Unexpected error');
+                toastError(typeof data === 'string' ? data : 'Unexpected error');
                 break;
             }
         }

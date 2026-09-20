@@ -77,6 +77,11 @@ export default function CheckoutStepper() {
 
             const orderModel = await createOrderModel();
             const orderResult = await createOrder(orderModel);
+            if ('error' in orderResult) {
+                // baseQueryWithErrorHandling already surfaced the API error; do not
+                // charge the card for an order that does not exist.
+                throw new Error('Unable to create the order - payment was not attempted');
+            }
             
             const paymentResult = await stripe.confirmPayment({
                 clientSecret: basket.clientSecret,
