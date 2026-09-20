@@ -10,7 +10,59 @@ using WebApiStore.RequestHelpers;
 using WebApiStore.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+var defaultConnection = ResolveConnectionString(builder.Configuration);
+
+// Managed Postgres hosts (Neon, Railway, Heroku, Supabase) publish a
+// postgres:// URI rather than an ADO.NET connection string, so accept either.
+// The unpooled host is preferred: Neon's pooled endpoint runs PgBouncer in
+// transaction mode, which does not support the prepared statements Npgsql uses.
+static string? ResolveConnectionString(IConfiguration config)
+{
+    var configured = config.GetConnectionString("DefaultConnection");
+    if (!string.IsNullOrWhiteSpace(configured)) return configured;
+
+    var uri = config["DATABASE_URL_UNPOOLED"]
+              ?? config["POSTGRES_URL_NON_POOLING"]
+              ?? config["DATABASE_URL"]
+              ?? config["POSTGRES_URL"];
+
+    return string.IsNullOrWhiteSpace(uri) ? null : BuildNpgsqlConnectionString(uri);
+}
+
+static string BuildNpgsqlConnectionString(string uri)
+{
+    var parsed = new Uri(uri);
+    var credentials = parsed.UserInfo.Split(':', 2);
+
+    var connectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder
+    {
+        Host = parsed.Host,
+        Port = parsed.IsDefaultPort ? 5432 : parsed.Port,
+        Database = parsed.AbsolutePath.TrimStart('/'),
+        Username = Uri.UnescapeDataString(credentials[0]),
+        Password = credentials.Length > 1 ? Uri.UnescapeDataString(credentials[1]) : null,
+        SslMode = ParseSslMode(parsed.Query),
+    };
+
+    return connectionStringBuilder.ConnectionString;
+}
+
+// Honour ?sslmode= from the URI; managed hosts require SSL, a local container
+// usually has none, and hardcoding either one breaks the other.
+static Npgsql.SslMode ParseSslMode(string query)
+{
+    var value = System.Web.HttpUtility.ParseQueryString(query)["sslmode"];
+
+    return value?.ToLowerInvariant() switch
+    {
+        "disable" => Npgsql.SslMode.Disable,
+        "allow" => Npgsql.SslMode.Allow,
+        "prefer" => Npgsql.SslMode.Prefer,
+        "verify-ca" => Npgsql.SslMode.VerifyCA,
+        "verify-full" => Npgsql.SslMode.VerifyFull,
+        _ => Npgsql.SslMode.Require,
+    };
+}
 
 // Add services to the container.
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));

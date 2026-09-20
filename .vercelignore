@@ -1,0 +1,32 @@
+# What the Vercel CLI uploads as the build context. Dockerfile.vercel restores
+# npm and NuGet packages inside the image, so none of this needs to travel.
+# (.dockerignore governs the docker build only; this governs the upload.)
+
+# Dependencies and build output
+**/node_modules
+**/bin
+**/obj
+**/dist
+WebApiStore/wwwroot
+
+# Version control and editor state
+.git
+.github
+**/.idea
+**/.vscode
+**/*.DotSettings.user
+**/.DS_Store
+
+# Secrets and local state - must never leave this machine
+**/appsettings.Development.json
+**/appsettings.*.Local.json
+**/.env
+**/.env.local
+**/secrets.json
+**/*.db
+**/*.pfx
+**/*.key
+**/*.pem
+
+# Local-only tooling
+docker-compose.yml

@@ -51,3 +51,5 @@ nunit-*.xml
 # WebApiStore/appsettings.json   # now committed WITHOUT secrets; real values live in user-secrets / env vars
 WebApiStore/wwwroot/
 # WebApiStore/appSettings.json   # now committed WITHOUT secrets; real values live in user-secrets / env vars
+.vercel
+.env*
