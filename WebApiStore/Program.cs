@@ -1,3 +1,6 @@
+using System.Reflection;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApiStore.Data;
@@ -17,7 +20,11 @@ builder.Services.AddDbContext<StoreContext>(options =>
     options.UseSqlServer(defaultConnection);
 });
 builder.Services.AddCors();
-builder.Services.AddAutoMapper(_ => { }, AppDomain.CurrentDomain.GetAssemblies());
+var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+mapsterConfig.Scan(Assembly.GetExecutingAssembly());
+mapsterConfig.Compile(); // fail fast on a bad mapping instead of on first request
+builder.Services.AddSingleton(mapsterConfig);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.AddTransient<ExceptionMiddleWare>();
 builder.Services.AddScoped<PaymentsService>();
 builder.Services.AddScoped<ImageService>();

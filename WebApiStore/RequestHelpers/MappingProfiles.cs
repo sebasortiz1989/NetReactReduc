@@ -1,14 +1,19 @@
-using AutoMapper;
+using Mapster;
 using WebApiStore.DTOs;
 using WebApiStore.Entities;
 
 namespace WebApiStore.RequestHelpers;
 
-public class MappingProfiles : Profile
+public class MappingProfiles : IRegister
 {
-    public MappingProfiles()
+    public void Register(TypeAdapterConfig config)
     {
-        CreateMap<CreateProductDto, Product>();
-        CreateMap<UpdateProductDto, Product>();
+        // Mapster maps same-named members by convention; these entries exist so
+        // the mappings are explicit and have a home for future rules.
+        config.NewConfig<CreateProductDto, Product>()
+            .Ignore(dest => dest.Id);
+
+        config.NewConfig<UpdateProductDto, Product>()
+            .Ignore(dest => dest.Id);
     }
 }

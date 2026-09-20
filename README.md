@@ -38,7 +38,40 @@ If you want to delete de database you can run this command in the terminal:
 dotnet ef database drop
 ```
 
-# Running the project
+# Running locally
+
+Prerequisites: .NET 10 SDK, Node 20+, Docker (OrbStack or Docker Desktop).
+
+**1. Start SQL Server** (the app has no local SQL Server; it runs in a container):
+
+```
+docker compose up -d
+```
+
+The connection string in `WebApiStore/appsettings.Development.json` points at
+`localhost,1433` with the `sa` password from `docker-compose.yml`. The container
+keeps its data in the `sql_data` volume, so the database survives restarts.
+
+**2. Start the API** (applies EF migrations and seeds on startup):
+
+```
+cd WebApiStore && dotnet run --launch-profile https
+```
+
+- API: https://localhost:5005 (also http://0.0.0.0:5010 for LAN)
+- Seeded accounts: `admin@test.com` / `seba@test.com`, password `Pa$$w0rd`
+
+**3. Start the React client:**
+
+```
+cd websitestorereact && npm install && npm run dev
+```
+
+- Client: https://localhost:3000 (`npm run lan` for plain HTTP on the network)
+
+To reset the database completely: `docker compose down -v`, then start again.
+
+# Hot reload
 
 if you use `dotnet watch` to run the project, you can take advantage of hot reload.
 
