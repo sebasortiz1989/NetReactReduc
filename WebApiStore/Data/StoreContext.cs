@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,8 +7,13 @@ using WebApiStore.Entities.OrderAggregate;
 
 namespace WebApiStore.Data;
 
-public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options)
+public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options), IDataProtectionKeyContext
 {
+    // Data Protection keys must be shared across instances. On a scale-to-zero
+    // host every request can hit a fresh container, and keys kept on local disk
+    // would leave each instance unable to decrypt the others' auth cookies.
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
+
     public required DbSet<Product> Products { get; set; }
     public required DbSet<Basket> Baskets { get; set; }
     public required DbSet<Order> Orders { get; set; }

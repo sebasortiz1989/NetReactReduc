@@ -1,5 +1,6 @@
 using System.Reflection;
 using Mapster;
+using Microsoft.AspNetCore.DataProtection;
 using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,11 @@ builder.Services.AddDbContext<StoreContext>(options =>
 {
     options.UseNpgsql(defaultConnection);
 });
+// Shared, durable key ring so auth cookies survive across container instances.
+// SetApplicationName must be stable, or each instance derives a different purpose.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<StoreContext>()
+    .SetApplicationName("restore-store");
 builder.Services.AddCors();
 var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 mapsterConfig.Scan(Assembly.GetExecutingAssembly());
