@@ -49,7 +49,7 @@ docker compose up -d
 ```
 
 The connection string in `WebApiStore/appsettings.Development.json` points at
-`localhost:5432` with the password from `docker-compose.yml`. The container keeps
+`localhost:5434` with the password from `docker-compose.yml`. The container keeps
 its data in the `pg_data` volume, so the database survives restarts.
 
 **2. Supply your own secrets.** No credentials are committed to this repository.
